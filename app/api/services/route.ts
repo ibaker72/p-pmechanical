@@ -31,13 +31,14 @@ export function GET() {
       services: SERVICES.map((s) => ({
         slug: s.slug,
         name: s.name,
+        segment: s.segment,
         short: s.short,
         description: s.description,
         starting_price: s.startingPrice ?? null,
         included: s.whatsIncluded,
         process: s.process,
         faqs: s.faqs,
-        url: `${SITE_URL}/services/${s.slug}`,
+        url: `${SITE_URL}${s.segment === 'commercial' ? '/commercial' : '/services'}/${s.slug}`,
       })),
       service_areas: ALL_SERVICE_AREAS.map((city) => ({
         city,

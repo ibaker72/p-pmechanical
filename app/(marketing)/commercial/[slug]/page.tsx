@@ -10,12 +10,14 @@ import {
   Wind,
   Siren,
   ShieldCheck,
+  Building,
+  Building2,
   Check,
   ArrowRight,
   Phone,
   MapPin,
 } from 'lucide-react';
-import { RESIDENTIAL_SERVICES, BUSINESS } from '@/lib/constants';
+import { COMMERCIAL_SERVICES, BUSINESS } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import {
   Accordion,
@@ -41,48 +43,55 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Wind,
   Siren,
   ShieldCheck,
+  Building,
+  Building2,
 };
 
 export function generateStaticParams() {
-  return RESIDENTIAL_SERVICES.map((s) => ({ slug: s.slug }));
+  return COMMERCIAL_SERVICES.map((s) => ({ slug: s.slug }));
 }
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const s = RESIDENTIAL_SERVICES.find((x) => x.slug === params.slug);
+  const s = COMMERCIAL_SERVICES.find((x) => x.slug === params.slug);
   if (!s) return {};
   return {
-    title: `${s.name} in Clifton, NJ`,
+    title: `${s.name} | Commercial HVAC in North Jersey`,
     description:
-      `${s.short} P&P Mechanical serves Clifton, Passaic County, and surrounding North Jersey areas with same-day service.`.slice(
+      `${s.short} P&P Mechanical serves commercial customers across Clifton, Passaic County, Essex, and Bergen.`.slice(
         0,
         158,
       ),
-    alternates: { canonical: `/services/${s.slug}` },
+    alternates: { canonical: `/commercial/${s.slug}` },
     openGraph: {
-      title: `${s.name} in Clifton, NJ | ${BUSINESS.name}`,
+      title: `${s.name} | Commercial HVAC | ${BUSINESS.name}`,
       description: s.short,
-      url: `/services/${s.slug}`,
+      url: `/commercial/${s.slug}`,
     },
   };
 }
 
-export default function ServicePage({ params }: { params: { slug: string } }) {
-  const service = RESIDENTIAL_SERVICES.find((s) => s.slug === params.slug);
+export default function CommercialServicePage({ params }: { params: { slug: string } }) {
+  const service = COMMERCIAL_SERVICES.find((s) => s.slug === params.slug);
   if (!service) notFound();
   const Icon = ICONS[service.icon] ?? Wrench;
-  const related = RESIDENTIAL_SERVICES.filter((s) => s.slug !== service.slug).slice(0, 3);
+  const related = COMMERCIAL_SERVICES.filter((s) => s.slug !== service.slug).slice(0, 3);
 
   return (
     <>
       <LocalBusinessSchema />
-      <ServiceSchema name={service.name} description={service.short} slug={service.slug} />
+      <ServiceSchema
+        name={service.name}
+        description={service.short}
+        slug={service.slug}
+        urlPath={`/commercial/${service.slug}`}
+      />
       <HowToSchema name={service.name} description={service.short} steps={service.process} />
       <FaqSchema faqs={service.faqs} />
       <BreadcrumbSchema
         items={[
           { name: 'Home', href: '/' },
-          { name: 'Services', href: '/services' },
-          { name: service.name, href: `/services/${service.slug}` },
+          { name: 'Commercial', href: '/commercial' },
+          { name: service.name, href: `/commercial/${service.slug}` },
         ]}
       />
 
@@ -102,8 +111,8 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
               Home
             </Link>
             <span className="px-2">/</span>
-            <Link href="/services" className="hover:text-ember-300">
-              Services
+            <Link href="/commercial" className="hover:text-ember-300">
+              Commercial
             </Link>
             <span className="px-2">/</span>
             <span className="text-white">{service.name}</span>
@@ -115,13 +124,13 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
               </div>
               <h1 className="heading-display text-balance">{service.name}</h1>
               <p className="mt-2 font-display text-xl text-ember-300">
-                Clifton · Passaic · Paterson · all of North Jersey
+                Commercial · North Jersey · 24/7 Dispatch
               </p>
               <p className="mt-5 max-w-2xl text-lg text-steel-100">{service.description}</p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
               <Button asChild size="lg" variant="primary">
-                <Link href="/quote">Get a Free Quote</Link>
+                <Link href="/quote?source=commercial">Talk to Our Commercial Team</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <a href={BUSINESS.phoneHref}>
@@ -138,7 +147,9 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         <div className="container-wide grid gap-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <span className="eyebrow mb-4">What&apos;s Included</span>
-            <h2 className="heading-section text-balance">Everything covered, nothing hidden.</h2>
+            <h2 className="heading-section text-balance">
+              Scope of work — engineered, not estimated.
+            </h2>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2">
               {service.whatsIncluded.map((item) => (
                 <li
@@ -154,15 +165,13 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
 
           <aside className="rounded-2xl border border-ember-500/40 bg-ember-500/5 p-8">
             <p className="text-xs font-bold uppercase tracking-widest text-ember-300">Pricing</p>
-            <p className="mt-3 font-display text-4xl text-white">
-              {service.startingPrice || 'Custom quote'}
-            </p>
+            <p className="mt-3 font-display text-3xl text-white">Custom commercial proposal</p>
             <p className="mt-2 text-sm text-steel-200">
-              We give you a firm, written, flat-rate price before any work begins — never an hourly
-              meter.
+              Every commercial job gets an engineered scope, written quote, and a defined schedule
+              before any work begins.
             </p>
             <Button asChild size="md" variant="primary" className="mt-6 w-full">
-              <Link href="/quote">Get Your Quote</Link>
+              <Link href="/quote?source=commercial">Request a Proposal</Link>
             </Button>
             <Button asChild size="md" variant="outline" className="mt-3 w-full">
               <a href={BUSINESS.phoneHref}>
@@ -177,7 +186,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
       <section className="border-y border-white/10 bg-ink-900/40 py-20 sm:py-24">
         <div className="container-wide">
           <span className="eyebrow mb-4">Our Process</span>
-          <h2 className="heading-section text-balance">How we get from call to comfort.</h2>
+          <h2 className="heading-section text-balance">How a commercial project runs with us.</h2>
           <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {service.process.map((step, i) => (
               <li
@@ -217,12 +226,12 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
       <section className="border-t border-white/10 bg-ink-900/40 py-20 sm:py-24">
         <div className="container-tight">
           <div className="mb-10 max-w-2xl">
-            <span className="eyebrow mb-4">Request Service</span>
+            <span className="eyebrow mb-4">Request a Proposal</span>
             <h2 className="heading-section text-balance">
               Tell us about your {service.name.toLowerCase()} project.
             </h2>
             <p className="mt-4 text-steel-200">
-              We&apos;ll call you back within 2 hours with next steps. For emergencies, dial{' '}
+              We&apos;ll respond within one business day with next steps. For emergencies, dial{' '}
               <a href={BUSINESS.phoneHref} className="font-bold text-ember-300 underline">
                 {BUSINESS.phone}
               </a>
@@ -230,7 +239,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-10">
-            <InlineLeadForm defaultService={service.name} source="service_page" />
+            <InlineLeadForm defaultService={service.name} source="commercial_service_page" />
           </div>
         </div>
       </section>
@@ -241,25 +250,25 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 lg:col-span-1">
             <MapPin className="mb-3 h-6 w-6 text-ember-400" />
             <h3 className="font-display text-2xl text-white">
-              Serving Clifton, NJ and surrounding areas
+              Serving commercial accounts across North Jersey
             </h3>
             <p className="mt-3 text-steel-200">
-              Our dispatch is based in Clifton, with tight arrival windows across Passaic and Essex
-              counties.
+              Dispatch from Clifton with coverage across Passaic, Essex, and Bergen counties.
+              Service contracts available with guaranteed response windows.
             </p>
             <Button asChild variant="outline" size="md" className="mt-5">
               <Link href="/locations">See all service areas</Link>
             </Button>
           </div>
           <div className="lg:col-span-2">
-            <h3 className="mb-6 font-display text-2xl text-white">Related services</h3>
+            <h3 className="mb-6 font-display text-2xl text-white">Related commercial services</h3>
             <div className="grid gap-4 sm:grid-cols-3">
               {related.map((r) => {
                 const RIcon = ICONS[r.icon] ?? Wrench;
                 return (
                   <Link
                     key={r.slug}
-                    href={`/services/${r.slug}`}
+                    href={`/commercial/${r.slug}`}
                     className="group flex flex-col gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-5 hover:border-ember-400/40"
                   >
                     <RIcon className="h-6 w-6 text-ember-400" />

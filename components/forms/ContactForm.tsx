@@ -7,7 +7,7 @@ import { Loader2, CheckCircle2, Send } from 'lucide-react';
 import { Input, Textarea, Select, Label, FieldError } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { contactSchema, type ContactInput } from '@/lib/validations';
-import { SERVICES, ALL_SERVICE_AREAS } from '@/lib/constants';
+import { RESIDENTIAL_SERVICES, COMMERCIAL_SERVICES, ALL_SERVICE_AREAS } from '@/lib/constants';
 import { Honeypot, readHoneypot } from './Honeypot';
 import { trackLead } from '@/lib/analytics';
 
@@ -95,11 +95,20 @@ export function ContactForm({ defaultCity, source = 'contact_form' }: ContactFor
           <Label htmlFor="c-service">Service of interest</Label>
           <Select id="c-service" {...register('service_type')}>
             <option value="">Any / not sure</option>
-            {SERVICES.map((s) => (
-              <option key={s.slug} value={s.name}>
-                {s.name}
-              </option>
-            ))}
+            <optgroup label="Residential">
+              {RESIDENTIAL_SERVICES.map((s) => (
+                <option key={s.slug} value={s.name}>
+                  {s.name}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label="Commercial">
+              {COMMERCIAL_SERVICES.map((s) => (
+                <option key={s.slug} value={s.name}>
+                  {s.name}
+                </option>
+              ))}
+            </optgroup>
           </Select>
         </div>
         <div>

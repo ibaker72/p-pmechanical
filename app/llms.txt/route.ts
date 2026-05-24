@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
-import { BUSINESS, SERVICES, LOCATIONS, ALL_SERVICE_AREAS } from '@/lib/constants';
+import {
+  BUSINESS,
+  RESIDENTIAL_SERVICES,
+  COMMERCIAL_SERVICES,
+  LOCATIONS,
+  ALL_SERVICE_AREAS,
+} from '@/lib/constants';
 import { getAllPosts } from '@/lib/blog';
 
 export const runtime = 'nodejs';
@@ -29,8 +35,11 @@ export function GET() {
 - Hours: 24/7/365 (live dispatch)
 - Website: ${SITE_URL}
 
-## Services
-${SERVICES.map((s) => `- [${s.name}](${SITE_URL}/services/${s.slug}): ${s.short}`).join('\n')}
+## Residential services
+${RESIDENTIAL_SERVICES.map((s) => `- [${s.name}](${SITE_URL}/services/${s.slug}): ${s.short}`).join('\n')}
+
+## Commercial services
+${COMMERCIAL_SERVICES.map((s) => `- [${s.name}](${SITE_URL}/commercial/${s.slug}): ${s.short}`).join('\n')}
 
 ## Service area
 Primary cities (dispatch within ~30 min):

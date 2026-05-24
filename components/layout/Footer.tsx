@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Flame, Facebook, Instagram, MapPin, Phone, Mail, ShieldCheck, Star } from 'lucide-react';
-import { BUSINESS, SERVICES, LOCATIONS } from '@/lib/constants';
+import { BUSINESS, RESIDENTIAL_SERVICES, COMMERCIAL_SERVICES, LOCATIONS } from '@/lib/constants';
 
 export function Footer() {
   return (
@@ -23,18 +23,20 @@ export function Footer() {
       </div>
 
       <div className="container-wide py-16">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           {/* Company */}
           <div>
             <Link href="/" className="flex items-center gap-3" aria-label={`${BUSINESS.name} home`}>
               <span className="flex h-10 w-10 items-center justify-center rounded-md bg-ember-gradient">
                 <Flame className="h-5 w-5 text-ink-950" strokeWidth={2.5} />
               </span>
-              <span className="font-display text-xl text-white tracking-wider">P&amp;P MECHANICAL</span>
+              <span className="font-display text-xl tracking-wider text-white">
+                P&amp;P MECHANICAL
+              </span>
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-steel-200">
-              North Jersey&apos;s premier HVAC, boiler, and AC specialists. Same-day service, 24/7 emergency dispatch,
-              and the cleanest install jobs in Passaic County.
+              North Jersey&apos;s premier HVAC, boiler, and AC specialists. Same-day service, 24/7
+              emergency dispatch, and the cleanest install jobs in Passaic County.
             </p>
             <p className="mt-4 text-xs text-steel-300">{BUSINESS.license}</p>
             <p className="mt-1 text-xs text-steel-300">Founded {BUSINESS.founded}</p>
@@ -69,11 +71,13 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Services */}
+          {/* Residential Services */}
           <div>
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-ember-400">Services</h3>
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-ember-400">
+              Residential
+            </h3>
             <ul className="space-y-2.5">
-              {SERVICES.map((s) => (
+              {RESIDENTIAL_SERVICES.map((s) => (
                 <li key={s.slug}>
                   <Link
                     href={`/services/${s.slug}`}
@@ -86,9 +90,38 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Commercial Services */}
+          <div>
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-ember-400">
+              Commercial
+            </h3>
+            <ul className="space-y-2.5">
+              {COMMERCIAL_SERVICES.slice(0, 8).map((s) => (
+                <li key={s.slug}>
+                  <Link
+                    href={`/commercial/${s.slug}`}
+                    className="text-sm text-steel-100 hover:text-ember-300"
+                  >
+                    {s.name}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/commercial"
+                  className="text-sm font-semibold text-ember-300 hover:text-ember-200"
+                >
+                  All commercial services →
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           {/* Locations */}
           <div>
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-ember-400">Service Areas</h3>
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-ember-400">
+              Service Areas
+            </h3>
             <ul className="space-y-2.5">
               {LOCATIONS.map((l) => (
                 <li key={l.slug}>
@@ -105,20 +138,27 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-ember-400">Contact</h3>
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-ember-400">
+              Contact
+            </h3>
             <ul className="space-y-3 text-sm text-steel-100">
               <li className="flex items-start gap-2.5">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-ember-400" />
-                <a href={BUSINESS.phoneHref} className="hover:text-ember-300">{BUSINESS.phone}</a>
+                <a href={BUSINESS.phoneHref} className="hover:text-ember-300">
+                  {BUSINESS.phone}
+                </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-ember-400" />
-                <a href={`mailto:${BUSINESS.email}`} className="hover:text-ember-300">{BUSINESS.email}</a>
+                <a href={`mailto:${BUSINESS.email}`} className="hover:text-ember-300">
+                  {BUSINESS.email}
+                </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-ember-400" />
                 <span>
-                  {BUSINESS.address.street}<br />
+                  {BUSINESS.address.street}
+                  <br />
                   {BUSINESS.address.city}, {BUSINESS.address.region} {BUSINESS.address.postalCode}
                 </span>
               </li>
@@ -137,9 +177,13 @@ export function Footer() {
             © {new Date().getFullYear()} {BUSINESS.legalName}. All rights reserved.
           </p>
           <p className="text-xs text-steel-300">
-            <Link href="/privacy" className="hover:text-ember-300">Privacy</Link>
+            <Link href="/privacy" className="hover:text-ember-300">
+              Privacy
+            </Link>
             <span className="px-2 text-steel-500">·</span>
-            <Link href="/terms" className="hover:text-ember-300">Terms</Link>
+            <Link href="/terms" className="hover:text-ember-300">
+              Terms
+            </Link>
             <span className="px-2 text-steel-500">·</span>
             Built with precision in NJ
           </p>

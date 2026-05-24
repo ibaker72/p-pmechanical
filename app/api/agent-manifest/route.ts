@@ -125,9 +125,10 @@ export function GET() {
     services_summary: SERVICES.map((s) => ({
       slug: s.slug,
       name: s.name,
+      segment: s.segment,
       short: s.short,
       starting_price: s.startingPrice ?? null,
-      url: `${SITE_URL}/services/${s.slug}`,
+      url: `${SITE_URL}${s.segment === 'commercial' ? '/commercial' : '/services'}/${s.slug}`,
     })),
     service_areas: ALL_SERVICE_AREAS,
     contact_for_humans: {

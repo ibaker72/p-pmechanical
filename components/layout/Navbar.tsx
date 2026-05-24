@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 
 const NAV = [
   { href: '/services', label: 'Services' },
+  { href: '/commercial', label: 'Commercial' },
   { href: '/locations', label: 'Service Areas' },
   { href: '/about', label: 'About' },
   { href: '/blog', label: 'Blog' },
@@ -37,9 +38,7 @@ export function Navbar() {
     <header
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-all duration-300',
-        scrolled
-          ? 'border-b border-white/10 bg-ink-950/80 backdrop-blur-xl'
-          : 'bg-transparent',
+        scrolled ? 'border-b border-white/10 bg-ink-950/80 backdrop-blur-xl' : 'bg-transparent',
       )}
     >
       <div className="container-wide flex h-20 items-center justify-between">
@@ -48,12 +47,16 @@ export function Navbar() {
             <Flame className="h-5 w-5 text-ink-950" strokeWidth={2.5} />
           </span>
           <span className="flex flex-col leading-none">
-            <span className="font-display text-xl font-bold text-white tracking-wider">P&amp;P MECHANICAL</span>
-            <span className="text-[10px] uppercase tracking-[0.25em] text-ember-300">HVAC · Boiler · AC</span>
+            <span className="font-display text-xl font-bold tracking-wider text-white">
+              P&amp;P MECHANICAL
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.25em] text-ember-300">
+              HVAC · Boiler · AC
+            </span>
           </span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-8" aria-label="Primary">
+        <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
           {NAV.map((n) => (
             <Link
               key={n.href}
@@ -65,7 +68,7 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="hidden items-center gap-3 lg:flex">
           <a
             href={BUSINESS.phoneHref}
             className="group flex items-center gap-2 text-sm font-semibold text-white hover:text-ember-300"
@@ -81,7 +84,7 @@ export function Navbar() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="lg:hidden flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/5 text-white"
+          className="flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/5 text-white lg:hidden"
           aria-label="Open menu"
         >
           <Menu className="h-5 w-5" />
@@ -91,12 +94,12 @@ export function Navbar() {
       {/* Mobile menu */}
       <div
         className={cn(
-          'fixed inset-0 z-[60] flex flex-col bg-ink-950/98 backdrop-blur-xl transition-opacity lg:hidden',
-          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
+          'bg-ink-950/98 fixed inset-0 z-[60] flex flex-col backdrop-blur-xl transition-opacity lg:hidden',
+          open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
         )}
       >
         <div className="flex h-20 items-center justify-between px-6">
-          <span className="font-display text-xl text-white tracking-wider">P&amp;P MECHANICAL</span>
+          <span className="font-display text-xl tracking-wider text-white">P&amp;P MECHANICAL</span>
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -121,12 +124,14 @@ export function Navbar() {
         <div className="mt-auto flex flex-col gap-3 p-6">
           <a
             href={BUSINESS.phoneHref}
-            className="flex h-12 items-center justify-center gap-2 rounded-md border border-white/15 bg-white/5 text-white font-semibold"
+            className="flex h-12 items-center justify-center gap-2 rounded-md border border-white/15 bg-white/5 font-semibold text-white"
           >
             <Phone className="h-4 w-4 text-ember-400" /> {BUSINESS.phone}
           </a>
           <Button asChild size="lg" variant="primary" className="w-full">
-            <Link href="/quote" onClick={() => setOpen(false)}>Get Free Quote</Link>
+            <Link href="/quote" onClick={() => setOpen(false)}>
+              Get Free Quote
+            </Link>
           </Button>
         </div>
       </div>

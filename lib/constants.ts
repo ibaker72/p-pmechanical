@@ -32,6 +32,7 @@ export const BUSINESS = {
 export type Service = {
   slug: string;
   name: string;
+  segment: 'residential' | 'commercial';
   short: string;
   description: string;
   startingPrice?: string;
@@ -45,6 +46,7 @@ export const SERVICES: Service[] = [
   {
     slug: 'hvac-installation',
     name: 'HVAC Installation',
+    segment: 'residential',
     short: 'New, high-efficiency heating & cooling systems installed by NJ-licensed pros.',
     description:
       'Complete HVAC system installation for North Jersey homes and small businesses. We size every system from a Manual J load calc — never guesswork — and back the work with a workmanship warranty.',
@@ -104,6 +106,7 @@ export const SERVICES: Service[] = [
   {
     slug: 'hvac-repair',
     name: 'HVAC Repair',
+    segment: 'residential',
     short: 'Fast diagnostics, transparent quotes, same-day repairs across North Jersey.',
     description:
       'When your system goes down, you need it fixed right the first time. Our diagnostic flat-rate gets us under the hood and into a plan — no hourly meter running.',
@@ -162,6 +165,7 @@ export const SERVICES: Service[] = [
   {
     slug: 'boiler-installation',
     name: 'Boiler Installation',
+    segment: 'residential',
     short: 'Modern high-efficiency boilers for older NJ homes — hot water and steam.',
     description:
       'Clifton, Paterson, and Montclair have some of the oldest boiler stock in the country. We replace tired cast-iron units with sealed-combustion, condensing boilers that cut gas bills by 25–40% and run nearly silent.',
@@ -220,6 +224,7 @@ export const SERVICES: Service[] = [
   {
     slug: 'boiler-repair',
     name: 'Boiler Repair',
+    segment: 'residential',
     short: 'No heat? We diagnose and repair gas, oil, and steam boilers around the clock.',
     description:
       'Boiler problems in a Jersey winter are a true emergency. Our techs are trained on every major residential boiler — from 1950s American Standard cast-iron to brand-new Navien wall-hangs.',
@@ -271,6 +276,7 @@ export const SERVICES: Service[] = [
   {
     slug: 'ac-installation',
     name: 'AC Installation',
+    segment: 'residential',
     short: 'Central air, ductless mini-splits, and high-velocity systems engineered for NJ.',
     description:
       'From a single-zone mini-split to a full central system, we right-size and install AC that cools evenly, runs quietly, and survives the NJ humidity.',
@@ -326,6 +332,7 @@ export const SERVICES: Service[] = [
   {
     slug: 'ac-repair',
     name: 'AC Repair',
+    segment: 'residential',
     short: 'Same-day AC repair when North Jersey humidity hits triple digits.',
     description:
       'When the AC quits on a 95° day, our trucks roll. Flat-rate diagnostic, transparent repair pricing, 90-day workmanship warranty.',
@@ -374,6 +381,7 @@ export const SERVICES: Service[] = [
   {
     slug: 'emergency-hvac',
     name: '24/7 Emergency HVAC',
+    segment: 'residential',
     short: 'No heat, no AC, no questions — our after-hours line is staffed every day of the year.',
     description:
       'A real technician answers your call at 2 a.m. on Christmas. We dispatch a stocked truck and most calls are resolved on the first visit.',
@@ -426,6 +434,7 @@ export const SERVICES: Service[] = [
   {
     slug: 'maintenance-plans',
     name: 'Maintenance Plans',
+    segment: 'residential',
     short:
       'Tune-ups, priority dispatch, and 15% off all repairs — for less than a tank of gas a month.',
     description:
@@ -476,7 +485,640 @@ export const SERVICES: Service[] = [
       },
     ],
   },
+
+  // --- Commercial services ---
+  {
+    slug: 'commercial-hvac-installation',
+    name: 'Commercial HVAC Installation',
+    segment: 'commercial',
+    short:
+      'Design-build commercial HVAC for offices, retail, restaurants, warehouses, and industrial facilities across North Jersey.',
+    description:
+      'From a single rooftop unit replacement on a strip-mall storefront to a multi-system design-build for a new commercial building, our commercial division handles HVAC at any scale. NJ-licensed, fully insured, OSHA-trained crews and engineered designs sized to ACCA Manual N — never guessed.',
+    icon: 'Building2',
+    process: [
+      {
+        title: 'Site walk & load analysis',
+        description: 'Manual N or block-load calc, ventilation review, electrical capacity check.',
+      },
+      {
+        title: 'Engineered proposal',
+        description:
+          'Equipment schedule, single-line diagrams, capital and operating-cost projections.',
+      },
+      {
+        title: 'Permitting & coordination',
+        description:
+          'We pull mechanical, electrical, and roofing permits and coordinate with GC, landlord, and tenants.',
+      },
+      {
+        title: 'Install, commission, train',
+        description:
+          'Phased install with minimal downtime, full commissioning, and operator training on day one.',
+      },
+    ],
+    whatsIncluded: [
+      'Manual N / block load engineering',
+      'High-efficiency packaged or split equipment',
+      'Curb adapters, structural review, crane lifts',
+      'Variable-speed drives & demand-control ventilation',
+      'Smart controls / BAS integration',
+      'Permits, inspections, and manufacturer registration',
+      'Owner training and as-built documentation',
+      'Workmanship warranty + extended equipment coverage',
+    ],
+    faqs: [
+      {
+        q: 'What size commercial jobs do you take on?',
+        a: 'Anything from a 3-ton rooftop swap on a single storefront up to multi-hundred-ton plants for office buildings, warehouses, and industrial facilities. No scope limit — if it heats or cools a commercial building, we do it.',
+      },
+      {
+        q: 'Can you work around our business hours?',
+        a: 'Yes. Most commercial installs are phased so that occupied spaces stay conditioned during business hours, with disruptive work scheduled nights and weekends. We build the schedule around your operation.',
+      },
+      {
+        q: 'Do you handle the structural and electrical side?',
+        a: 'Yes. We coordinate roof structural review, crane lifts, electrical service upgrades, and gas-line work in-house or with licensed partner contractors. One point of contact for the whole job.',
+      },
+      {
+        q: 'What brands do you install on commercial projects?',
+        a: 'Carrier, Trane, Lennox, Daikin, Mitsubishi, LG, Bosch, AAON, and Lochinvar — chosen to fit the application, efficiency target, and budget.',
+      },
+    ],
+  },
+  {
+    slug: 'commercial-hvac-repair',
+    name: 'Commercial HVAC Repair',
+    segment: 'commercial',
+    short:
+      '24/7 commercial HVAC diagnostics and repair — no system, no brand, no scope we will not tackle.',
+    description:
+      'When a commercial system goes down, every hour costs money. Our commercial techs roll with stocked trucks, factory training across every major brand, and the diagnostic equipment to fix it on the first visit whenever parts allow.',
+    icon: 'Cog',
+    process: [
+      {
+        title: 'Priority dispatch',
+        description: 'Service-contract customers get front-of-line dispatch 24/7.',
+      },
+      {
+        title: 'Full diagnostic',
+        description:
+          'Combustion, refrigerant, electrical, and controls — instrumented, not guessed.',
+      },
+      {
+        title: 'Written repair quote',
+        description: 'Flat-rate or T&M with a not-to-exceed — your call.',
+      },
+      {
+        title: 'Repair, test, document',
+        description: 'Cycle test, log readings, leave a written service ticket on every visit.',
+      },
+    ],
+    whatsIncluded: [
+      'Rooftop unit (RTU) repair',
+      'Split-system & VRF/VRV repair',
+      'Chiller and cooling-tower service',
+      'Commercial boiler and water-heater repair',
+      'Controls, BAS, and thermostat troubleshooting',
+      'Refrigerant leak detection and EPA-compliant recovery',
+      'Written service tickets with photos',
+    ],
+    faqs: [
+      {
+        q: 'Are you available after hours for commercial outages?',
+        a: 'Yes — 24/7/365. Service-contract customers get priority dispatch with a guaranteed response window.',
+      },
+      {
+        q: 'Do you service every brand?',
+        a: 'Yes. Carrier, Trane, Lennox, York, Daikin, Mitsubishi, LG, AAON, Bosch, Bryant, Reznor, and more. We carry common parts for all of them on the truck.',
+      },
+      {
+        q: 'Can you work on our existing service contract terms?',
+        a: 'Yes — we can quote against your existing PM schedule, take over from another contractor mid-term, or write a new contract from scratch.',
+      },
+    ],
+  },
+  {
+    slug: 'commercial-boiler-installation',
+    name: 'Commercial Boiler Installation',
+    segment: 'commercial',
+    short:
+      'High-efficiency commercial boiler installs — from 300 MBH wall-hangs to multi-million-BTU plant rebuilds.',
+    description:
+      'Commercial boiler work demands engineering and craftsmanship most contractors cannot offer. We handle the full scope: combustion engineering, near-boiler piping, primary-secondary loops, modulating controls, and combustion-analysis commissioning. Every install is sized, vented, and tuned by techs who do this every day.',
+    icon: 'Flame',
+    process: [
+      {
+        title: 'Heat-loss & demand study',
+        description: 'We size to the building, not to the old boiler.',
+      },
+      {
+        title: 'Equipment & piping design',
+        description: 'Primary-secondary, low-loss header, or full plant rebuild.',
+      },
+      {
+        title: 'Install & venting',
+        description: 'Sealed-combustion, B-vent, or stainless category IV venting as required.',
+      },
+      {
+        title: 'Combustion commissioning',
+        description: 'Full combustion analysis, written commissioning report, operator training.',
+      },
+    ],
+    whatsIncluded: [
+      'Modulating condensing boilers (95%+ AFUE)',
+      'Multi-boiler lead-lag plants with redundancy',
+      'Primary-secondary or low-loss header piping',
+      'Outdoor reset and BAS-integrated controls',
+      'Indirect or storage water heaters',
+      'Stainless category IV venting',
+      'Permits and final combustion-analysis report',
+    ],
+    faqs: [
+      {
+        q: 'How long does a commercial boiler replacement take?',
+        a: 'Single-boiler swaps for small offices typically take 3–5 days. Multi-boiler plant rebuilds for larger buildings are scheduled 2–6 weeks depending on scope. We can run temporary heat where required.',
+      },
+      {
+        q: 'Do you handle steam plants?',
+        a: 'Yes. Low-pressure and high-pressure steam, including process steam for laundries, dry cleaners, and food service. We do not shy away from older steam infrastructure.',
+      },
+      {
+        q: 'Are NJ Clean Energy commercial rebates available?',
+        a: 'Yes — NJ Clean Energy offers significant rebates on qualifying high-efficiency commercial boilers, plus federal tax incentives. We handle the paperwork.',
+      },
+    ],
+  },
+  {
+    slug: 'commercial-boiler-repair',
+    name: 'Commercial Boiler Service & Repair',
+    segment: 'commercial',
+    short:
+      'Emergency commercial boiler repair, combustion tuning, and full mechanical-room rebuilds — 24/7.',
+    description:
+      'A commercial boiler failure in winter means lost revenue, frozen pipes, or unhappy tenants. We carry the parts, controls, and combustion analyzers to diagnose and repair every commercial boiler brand on the market, and we maintain a roster of rental boilers for true emergencies.',
+    icon: 'Thermometer',
+    process: [
+      {
+        title: '24/7 priority dispatch',
+        description: 'Service-contract customers get a guaranteed response window.',
+      },
+      {
+        title: 'Full diagnostic',
+        description: 'Combustion, ignition, controls, circulators, flow, and safety devices.',
+      },
+      {
+        title: 'Flat-rate or T&M quote',
+        description: 'Approve scope in writing before work begins.',
+      },
+      {
+        title: 'Repair, tune, document',
+        description:
+          'Combustion analysis on every visit, written service ticket logged to your account.',
+      },
+    ],
+    whatsIncluded: [
+      'Combustion analysis on every service visit',
+      'Ignition, flame-safeguard, and control diagnostics',
+      'Circulator, expansion, and air-elimination service',
+      'Low-water cutoff testing and certification',
+      'Burner tuning and efficiency reports',
+      'Emergency rental-boiler dispatch (when required)',
+    ],
+    faqs: [
+      {
+        q: 'Do you carry rental boilers for emergencies?',
+        a: 'Yes. We can deploy temporary boilers to maintain occupied buildings during major repairs. Coordinated through our service-contract program.',
+      },
+      {
+        q: 'How often should a commercial boiler be serviced?',
+        a: 'At least annually before the heating season; high-fire commercial steam plants benefit from quarterly inspections. Our service contracts schedule and document everything for you.',
+      },
+      {
+        q: 'Can you service oil-fired commercial boilers?',
+        a: 'Yes — gas, oil, dual-fuel, and steam boilers from every major commercial manufacturer.',
+      },
+    ],
+  },
+  {
+    slug: 'rooftop-units',
+    name: 'Rooftop Unit (RTU) Service',
+    segment: 'commercial',
+    short:
+      'RTU install, replacement, retrofit, and service for commercial roofs across North Jersey.',
+    description:
+      'Rooftop units are the workhorse of commercial HVAC, and we handle them at every stage of life — from sizing and crane-set on a new install to economizer retrofits, controls upgrades, and emergency repair on a 20-year-old York.',
+    icon: 'Building',
+    process: [
+      {
+        title: 'Site survey',
+        description: 'Roof structural check, curb measurement, electrical and gas verification.',
+      },
+      {
+        title: 'Equipment & curb adapter',
+        description:
+          'High-efficiency RTU spec, curb adapter engineered if existing curb is reused.',
+      },
+      {
+        title: 'Crane lift & set',
+        description: 'Coordinated lift with roofing contractor; minimal building disruption.',
+      },
+      {
+        title: 'Commission & verify',
+        description: 'Refrigerant charge, gas pressure, economizer commissioning, BAS integration.',
+      },
+    ],
+    whatsIncluded: [
+      'High-efficiency packaged RTUs (gas/electric, heat pump, dual-fuel)',
+      'Engineered curb adapters',
+      'Economizer commissioning per NJ energy code',
+      'Demand-control ventilation (DCV)',
+      'Smart-thermostat or BAS integration',
+      'Crane scheduling and roofing coordination',
+      'Permits and final inspection',
+    ],
+    faqs: [
+      {
+        q: 'Can you replace an RTU on a curb from a different manufacturer?',
+        a: 'Yes — we engineer or order a curb adapter so the new unit lands cleanly on the existing penetration. No re-roofing required in most cases.',
+      },
+      {
+        q: 'Do you handle the crane and roofing coordination?',
+        a: 'Yes — one point of contact for the entire swap, including crane, roofing patch, electrical, gas, and inspection.',
+      },
+      {
+        q: 'What if our roof structure cannot support a new RTU?',
+        a: 'We pull in a structural engineer to evaluate and reinforce as needed. We do not punt that problem to the customer.',
+      },
+    ],
+  },
+  {
+    slug: 'vrf-vrv-systems',
+    name: 'VRF & VRV Systems',
+    segment: 'commercial',
+    short:
+      'Daikin, Mitsubishi, and LG VRF/VRV design, install, and service for multi-zone commercial buildings.',
+    description:
+      'Variable Refrigerant Flow is the most flexible commercial HVAC platform available — zone-by-zone control, simultaneous heating and cooling, and best-in-class efficiency. We are factory-trained on all three major platforms and certified for branch-box and condenser commissioning.',
+    icon: 'Wind',
+    process: [
+      {
+        title: 'Zoning & load analysis',
+        description: 'Zone-level Manual N or building energy model.',
+      },
+      {
+        title: 'Refrigerant & piping design',
+        description: 'Branch-box layout, line lengths verified against manufacturer tables.',
+      },
+      {
+        title: 'Install & pressure test',
+        description: 'Triple evacuation, nitrogen pressure test, manufacturer-approved brazing.',
+      },
+      {
+        title: 'Commission & document',
+        description:
+          'Full system commissioning per manufacturer spec; controls programmed and trained.',
+      },
+    ],
+    whatsIncluded: [
+      'Single-phase and 3-phase VRF/VRV condensers',
+      'Heat-recovery or heat-pump systems',
+      'Branch controllers / branch boxes',
+      'Wall, ceiling-cassette, ducted, and concealed indoor units',
+      'Centralized and zone-level controls',
+      'Manufacturer-required pressure testing and commissioning',
+      'Extended-warranty registration',
+    ],
+    faqs: [
+      {
+        q: 'Why choose VRF/VRV over conventional commercial HVAC?',
+        a: 'VRF gives you zone-by-zone control, ductless flexibility, simultaneous heating and cooling, and IEER ratings that beat conventional systems by 25–40%. Best fit for offices with varied occupancy, mixed-use buildings, and retrofits where ductwork is impractical.',
+      },
+      {
+        q: 'Do you service existing VRF systems we did not install?',
+        a: 'Yes. We are factory-certified on Daikin, Mitsubishi (City Multi), and LG (Multi V) and can take over service on existing systems.',
+      },
+      {
+        q: 'Can VRF heat in cold New Jersey winters?',
+        a: 'Yes — modern hyper-heat / heat-recovery VRF systems are rated for full heating capacity down to 5°F and operation to -13°F. We size for the worst-case design day.',
+      },
+    ],
+  },
+  {
+    slug: 'chiller-service',
+    name: 'Chiller Installation & Service',
+    segment: 'commercial',
+    short:
+      'Air-cooled and water-cooled chiller install, repair, and annual service for commercial plants.',
+    description:
+      'Chillers are the heart of large commercial cooling, and they fail expensively when neglected. We install, repair, and maintain air-cooled and water-cooled chillers from 20 to 1,000+ tons, plus cooling towers, condenser-water pumps, and chemical treatment systems.',
+    icon: 'Snowflake',
+    process: [
+      {
+        title: 'Annual inspection or emergency response',
+        description: 'Scheduled annual inspection or 24/7 emergency diagnostics.',
+      },
+      {
+        title: 'Performance & oil analysis',
+        description: 'Compressor oil sampling, eddy-current tube testing, log review.',
+      },
+      {
+        title: 'Repair, retrofit, or replace',
+        description:
+          'Major repair, control retrofit, or full chiller replacement with TCO analysis.',
+      },
+      {
+        title: 'Water treatment & commissioning',
+        description: 'Condenser-water chemistry, tower service, full commissioning report.',
+      },
+    ],
+    whatsIncluded: [
+      'Air-cooled scroll, screw, and centrifugal chillers',
+      'Water-cooled chillers and cooling towers',
+      'Compressor rebuild and replacement',
+      'Eddy-current tube testing',
+      'Refrigerant management and EPA-compliant recovery',
+      'Variable-frequency drive (VFD) retrofits',
+      'Condenser-water chemical treatment',
+    ],
+    faqs: [
+      {
+        q: 'Do you handle low-pressure refrigerants (R-123, R-1233zd)?',
+        a: 'Yes. EPA Section 608 Universal certification plus manufacturer-specific training on Trane, Carrier, York, and Daikin centrifugal platforms.',
+      },
+      {
+        q: 'Can you take over an existing chiller plant?',
+        a: 'Yes — we onboard with a baseline inspection, oil analysis, and log review, then build a customized PM schedule.',
+      },
+      {
+        q: 'When does a chiller make sense vs. multiple smaller systems?',
+        a: 'Usually when total cooling load exceeds ~80–100 tons or when a single chilled-water loop simplifies a complex building. We run the numbers in our proposal.',
+      },
+    ],
+  },
+  {
+    slug: 'multi-family-hvac',
+    name: 'Multi-Family HVAC',
+    segment: 'commercial',
+    short:
+      'HVAC for apartment buildings, condos, and mixed-use — central plants, unit-level systems, and everything in between.',
+    description:
+      'Multi-family is its own animal — central boilers feeding 80 units, individual PTACs in a garden-style complex, tenant-by-tenant ductless retrofits in a condo association. We work with property managers, condo boards, and owner-occupants alike, with billing and reporting that fit each.',
+    icon: 'Building2',
+    process: [
+      {
+        title: 'Building & system audit',
+        description: 'Central plant condition, unit-level equipment age, deferred maintenance log.',
+      },
+      {
+        title: 'Capital plan or repair scope',
+        description: 'Recommendations for board review, with capital and operating projections.',
+      },
+      {
+        title: 'Phased work',
+        description: 'Common-area and tenant-occupied work scheduled to minimize disruption.',
+      },
+      {
+        title: 'Ongoing service contract',
+        description: 'PM, priority dispatch, and consolidated billing for property managers.',
+      },
+    ],
+    whatsIncluded: [
+      'Central boiler plant install, repair, and PM',
+      'Unit-by-unit furnace, AC, and ductless install',
+      'PTAC and through-the-wall replacement',
+      'Common-area HVAC and corridor ventilation',
+      'Tenant work-order handling with on-call dispatch',
+      'Annual safety, CO, and combustion certifications',
+      'Capital-planning reports for boards and property managers',
+    ],
+    faqs: [
+      {
+        q: 'Do you bill property managers or individual unit owners?',
+        a: 'Both. We can invoice the association, the building owner, or individual unit residents depending on the scope. Common-area work is billed to the association; unit-interior work can be billed to the resident.',
+      },
+      {
+        q: 'Can you respond to tenant calls directly?',
+        a: 'Yes. Property managers often give us a tenant hotline to call so we can triage and dispatch directly.',
+      },
+      {
+        q: 'Do you handle capital-planning reports?',
+        a: 'Yes — for condo boards and property managers we produce a written report on equipment condition, expected useful life, and capital recommendations.',
+      },
+    ],
+  },
+  {
+    slug: 'commercial-maintenance',
+    name: 'Commercial Preventive Maintenance',
+    segment: 'commercial',
+    short:
+      'Quarterly and annual PM contracts with priority dispatch, written reports, and discounted repair labor.',
+    description:
+      'Commercial HVAC is too expensive to run reactively. Our preventive-maintenance contracts catch problems early, document compliance, extend equipment life, and put your account at the front of the line when something does fail.',
+    icon: 'ShieldCheck',
+    process: [
+      {
+        title: 'Onboarding inspection',
+        description:
+          'Baseline every piece of equipment, log model and serial numbers, document condition.',
+      },
+      {
+        title: 'Custom PM schedule',
+        description: 'Quarterly, semi-annual, or annual per equipment type and criticality.',
+      },
+      {
+        title: 'Scheduled visits',
+        description: 'Automatic scheduling — no chasing, no missed visits.',
+      },
+      {
+        title: 'Written reports',
+        description:
+          'Every visit produces a written ticket; quarterly summary for management review.',
+      },
+    ],
+    whatsIncluded: [
+      'Customized PM schedule by equipment type',
+      'Priority emergency dispatch with guaranteed response',
+      '15–20% discount on all repair labor',
+      'Combustion analysis and refrigerant logs',
+      'Filter and belt inventory tracking',
+      'Annual condition report and capital recommendations',
+      'Consolidated monthly or quarterly billing',
+    ],
+    faqs: [
+      {
+        q: 'What is included in a typical PM visit?',
+        a: 'Full inspection per equipment manufacturer spec: refrigerant readings, combustion analysis, electrical tightening, motor amp draw, drive and belt service, filter change, drain clearing, controls verification, and a written ticket.',
+      },
+      {
+        q: 'Can you take over a contract from another vendor?',
+        a: 'Yes — we onboard with a baseline inspection and pick up the PM schedule from where it left off.',
+      },
+      {
+        q: 'Does the contract cover repair parts and labor?',
+        a: 'Contracts include preventive maintenance, priority dispatch, and discounted repair labor. Full-coverage contracts that include repair parts and labor are available for larger accounts — quoted on application.',
+      },
+    ],
+  },
+  {
+    slug: 'commercial-emergency-hvac',
+    name: '24/7 Commercial Emergency Service',
+    segment: 'commercial',
+    short:
+      'After-hours dispatch for commercial outages — restaurants, retail, warehouses, server rooms, and beyond.',
+    description:
+      'When a commercial system fails after hours, every minute matters. Our 24/7 commercial line is staffed by a real technician who can triage on the phone, dispatch the closest stocked truck, and have you back online before you open in the morning.',
+    icon: 'Siren',
+    process: [
+      {
+        title: 'Live call, any hour',
+        description: 'A real commercial technician answers — never an answering service.',
+      },
+      {
+        title: 'Phone triage',
+        description:
+          'Quick diagnostic over the phone often gets the system back online before we arrive.',
+      },
+      {
+        title: 'Stocked-truck dispatch',
+        description: 'Service-contract customers get a guaranteed response window.',
+      },
+      {
+        title: 'Restore, document, follow up',
+        description:
+          'On-site repair, written service ticket, and a follow-up call the next business day.',
+      },
+    ],
+    whatsIncluded: [
+      '24/7/365 live dispatch',
+      'Priority response for service-contract customers',
+      'RTU, split, VRF, chiller, and boiler coverage',
+      'Server-room and process-cooling dispatch',
+      'Carbon monoxide and combustion safety verification',
+      'Temporary rental units available for major outages',
+    ],
+    faqs: [
+      {
+        q: 'How fast can you respond after hours?',
+        a: 'Service-contract customers get a guaranteed response window (typically 2 hours within our core area). Walk-up emergency calls are dispatched as crews and trucks allow — typically same-night.',
+      },
+      {
+        q: 'Do you serve restaurants and retail with refrigeration too?',
+        a: 'HVAC, hot-side gas equipment, and walk-in refrigeration HVAC tie-ins — yes. Direct refrigeration repair (walk-in compressors, ice machines) we coordinate with partner specialists when needed.',
+      },
+      {
+        q: 'What if the building is unmanned?',
+        a: 'We can hold a key, work with an access app, or coordinate with your security company. Many of our commercial accounts give us after-hours access by arrangement.',
+      },
+    ],
+  },
+  {
+    slug: 'building-automation',
+    name: 'Building Automation & Controls',
+    segment: 'commercial',
+    short:
+      'BAS install, integration, retrofit, and tuning — Honeywell, Johnson, Pelican, and ecobee SmartBuildings.',
+    description:
+      'A modern commercial building runs on its controls. We install, retrofit, and tune building automation systems that cut energy bills, document compliance, and give facilities staff real visibility into what every piece of equipment is doing.',
+    icon: 'Cog',
+    process: [
+      {
+        title: 'Audit existing controls',
+        description: 'Document current sequence of operations, identify gaps and quick wins.',
+      },
+      {
+        title: 'Retrofit or new design',
+        description: 'Open-protocol (BACnet) hardware spec, sequence development, alarm strategy.',
+      },
+      {
+        title: 'Install & program',
+        description: 'Field hardware, network, graphics, and trend logs.',
+      },
+      {
+        title: 'Tune & train',
+        description:
+          'Live tuning under load, written sequence documentation, and operator training.',
+      },
+    ],
+    whatsIncluded: [
+      'BACnet/IP and BACnet/MSTP networks',
+      'Honeywell, Johnson Controls, Pelican, ecobee SmartBuildings',
+      'Sequence of operations development',
+      'Energy dashboards and trending',
+      'Demand-response and utility-rate-aware control',
+      'Tenant- and zone-level scheduling',
+      'Remote monitoring and alerting',
+    ],
+    faqs: [
+      {
+        q: 'Can you integrate with our existing BAS?',
+        a: 'Yes — we work with open-protocol systems (BACnet, Modbus) and can integrate new equipment into existing front-ends, or replace a closed-protocol system in phases.',
+      },
+      {
+        q: 'How much can good controls save us?',
+        a: 'Typical commercial buildings see 10–25% energy savings from a properly tuned BAS. Demand-response participation can add to that.',
+      },
+      {
+        q: 'Do you offer remote monitoring?',
+        a: 'Yes — we can monitor critical commercial buildings 24/7 and alert your team and ours when something drifts out of spec.',
+      },
+    ],
+  },
+  {
+    slug: 'commercial-ductwork',
+    name: 'Commercial Ductwork & Sheet Metal',
+    segment: 'commercial',
+    short:
+      'Custom duct fabrication, retrofits, kitchen exhaust, and ventilation upgrades for commercial spaces.',
+    description:
+      'Commercial HVAC lives or dies by the ductwork. We design, fabricate, and install commercial sheet metal in-house — including code-compliant kitchen exhaust, makeup air, lab and process exhaust, and general HVAC ducting.',
+    icon: 'Wrench',
+    process: [
+      {
+        title: 'Survey & airflow design',
+        description: 'CFM targets, duct sizing per SMACNA / NFPA 96 where applicable.',
+      },
+      {
+        title: 'In-house fabrication',
+        description: 'Custom rectangular and spiral duct, fittings, and transitions.',
+      },
+      {
+        title: 'Install & seal',
+        description: 'SMACNA-leakage-class sealing, hangers, and supports to code.',
+      },
+      {
+        title: 'Balance & verify',
+        description: 'Test-and-balance report, CFM verification at every diffuser.',
+      },
+    ],
+    whatsIncluded: [
+      'Custom rectangular and spiral sheet-metal fabrication',
+      'Commercial kitchen exhaust hoods and makeup air (NFPA 96)',
+      'Lab, paint-booth, and process exhaust',
+      'Smoke and fire-damper installation',
+      'Duct insulation and acoustic lining',
+      'SMACNA-compliant sealing and hangers',
+      'Air balancing and verification reports',
+    ],
+    faqs: [
+      {
+        q: 'Do you fabricate in-house?',
+        a: 'Yes — most ducting and fittings are fabricated in our shop, which controls quality and turnaround time on custom work.',
+      },
+      {
+        q: 'Can you handle a commercial kitchen hood install?',
+        a: 'Yes — full NFPA 96 compliant kitchen exhaust hood, ductwork, and makeup-air install, including grease-duct cleanouts and fire-suppression coordination.',
+      },
+      {
+        q: 'Do you do test-and-balance?',
+        a: 'Yes. Every commercial install ships with a TAB report showing CFM at every diffuser against design.',
+      },
+    ],
+  },
 ];
+
+export const RESIDENTIAL_SERVICES = SERVICES.filter((s) => s.segment === 'residential');
+export const COMMERCIAL_SERVICES = SERVICES.filter((s) => s.segment === 'commercial');
 
 export type Location = {
   slug: string;
@@ -771,7 +1413,7 @@ export const GENERAL_FAQS: { q: string; a: string; category: string }[] = [
   {
     category: 'Service Area',
     q: 'Do you handle commercial HVAC work?',
-    a: 'Yes — light commercial rooftop units, small office and retail systems, and multi-family residential buildings. We carry $2M general liability and offer service contracts with priority dispatch.',
+    a: 'Yes — full-service commercial HVAC at any scale. Rooftop units, VRF/VRV, chillers, commercial boilers, multi-family buildings, building automation, and 24/7 emergency dispatch. See /commercial for the full lineup. We carry $2M general liability and offer service contracts with priority dispatch.',
   },
   {
     category: 'Emergency',

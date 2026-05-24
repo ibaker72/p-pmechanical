@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { SERVICES, LOCATIONS } from '@/lib/constants';
+import { RESIDENTIAL_SERVICES, COMMERCIAL_SERVICES, LOCATIONS } from '@/lib/constants';
 import { getAllPosts } from '@/lib/blog';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalhvac.com';
@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
     '',
     '/services',
+    '/commercial',
     '/locations',
     '/about',
     '/contact',
@@ -23,8 +24,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === '' ? 1.0 : 0.8,
   }));
 
-  const servicePages = SERVICES.map((s) => ({
+  const servicePages = RESIDENTIAL_SERVICES.map((s) => ({
     url: `${SITE_URL}/services/${s.slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.85,
+  }));
+
+  const commercialServicePages = COMMERCIAL_SERVICES.map((s) => ({
+    url: `${SITE_URL}/commercial/${s.slug}`,
     lastModified: now,
     changeFrequency: 'monthly' as const,
     priority: 0.85,
@@ -44,5 +52,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...servicePages, ...locationPages, ...blogPages];
+  return [
+    ...staticPages,
+    ...servicePages,
+    ...commercialServicePages,
+    ...locationPages,
+    ...blogPages,
+  ];
 }

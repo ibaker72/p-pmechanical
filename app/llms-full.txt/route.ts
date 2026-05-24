@@ -42,8 +42,8 @@ ${author.name} — ${author.role}. ${author.yearsExperience}+ years of experienc
 ## Services (detailed)
 
 ${SERVICES.map(
-  (s) => `### ${s.name}
-URL: ${SITE_URL}/services/${s.slug}
+  (s) => `### ${s.name} (${s.segment})
+URL: ${SITE_URL}${s.segment === 'commercial' ? '/commercial' : '/services'}/${s.slug}
 Starting price: ${s.startingPrice ?? 'Custom quote'}
 
 ${s.description}

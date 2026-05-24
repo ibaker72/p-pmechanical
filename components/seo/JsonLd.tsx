@@ -4,10 +4,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || BUSINESS.url;
 
 function Script({ data }: { data: object }) {
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
   );
 }
 
@@ -43,10 +40,12 @@ export function ServiceSchema({
   name,
   description,
   slug,
+  urlPath,
 }: {
   name: string;
   description: string;
   slug: string;
+  urlPath?: string;
 }) {
   return (
     <Script
@@ -66,7 +65,7 @@ export function ServiceSchema({
           '@type': 'City',
           name: c,
         })),
-        url: `${SITE_URL}/services/${slug}`,
+        url: `${SITE_URL}${urlPath ?? `/services/${slug}`}`,
       }}
     />
   );
@@ -88,11 +87,7 @@ export function FaqSchema({ faqs }: { faqs: { q: string; a: string }[] }) {
   );
 }
 
-export function BreadcrumbSchema({
-  items,
-}: {
-  items: { name: string; href: string }[];
-}) {
+export function BreadcrumbSchema({ items }: { items: { name: string; href: string }[] }) {
   return (
     <Script
       data={{

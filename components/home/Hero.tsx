@@ -15,11 +15,11 @@ const badges = [
 
 export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden bg-hero-noise heat-shimmer">
+    <section className="heat-shimmer relative isolate overflow-hidden bg-hero-noise">
       {/* Grid overlay */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-grid-faint bg-[length:64px_64px] opacity-30 mask-fade-b"
+        className="mask-fade-b absolute inset-0 bg-grid-faint bg-[length:64px_64px] opacity-30"
       />
       {/* Particles */}
       <div aria-hidden className="absolute inset-0 overflow-hidden">
@@ -44,15 +44,16 @@ export function Hero() {
           className="max-w-3xl"
         >
           <span className="eyebrow mb-6">Clifton · Passaic · Paterson · North Jersey</span>
-          <h1 className="heading-display text-balance text-shadow-hero">
+          <h1 className="heading-display text-shadow-hero text-balance">
             North Jersey&apos;s
             <span className="block bg-ember-gradient bg-clip-text text-transparent">
               Premier HVAC & Boiler Specialists
             </span>
           </h1>
-          <p className="mt-6 max-w-2xl text-lg sm:text-xl leading-relaxed text-steel-100">
-            Serving Clifton, Passaic County &amp; surrounding areas — available 24/7 for emergencies.
-            Licensed, insured, and committed to the kind of craftsmanship most HVAC contractors forgot how to deliver.
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-steel-100 sm:text-xl">
+            Residential &amp; commercial — installation, repair, and 24/7 emergency dispatch across
+            Clifton, Passaic County, and surrounding areas. Licensed, insured, and committed to the
+            kind of craftsmanship most HVAC contractors forgot how to deliver.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-4">
@@ -68,7 +69,10 @@ export function Hero() {
 
           <ul className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
             {badges.map(({ icon: Icon, label }) => (
-              <li key={label} className="flex items-center gap-2 text-sm font-medium text-steel-100">
+              <li
+                key={label}
+                className="flex items-center gap-2 text-sm font-medium text-steel-100"
+              >
                 <Icon className="h-4 w-4 text-ember-400" />
                 {label}
               </li>

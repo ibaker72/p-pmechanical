@@ -7,7 +7,7 @@ import { Loader2, CheckCircle2, Send } from 'lucide-react';
 import { Input, Textarea, Select, Label, FieldError } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { inlineLeadSchema, type InlineLeadInput } from '@/lib/validations';
-import { SERVICES } from '@/lib/constants';
+import { RESIDENTIAL_SERVICES, COMMERCIAL_SERVICES } from '@/lib/constants';
 import { Honeypot, readHoneypot } from './Honeypot';
 import { trackLead } from '@/lib/analytics';
 
@@ -87,11 +87,20 @@ export function InlineLeadForm({
         <Label htmlFor="il-service">Service</Label>
         <Select id="il-service" {...register('service_type')}>
           <option value="">Choose a service…</option>
-          {SERVICES.map((s) => (
-            <option key={s.slug} value={s.name}>
-              {s.name}
-            </option>
-          ))}
+          <optgroup label="Residential">
+            {RESIDENTIAL_SERVICES.map((s) => (
+              <option key={s.slug} value={s.name}>
+                {s.name}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label="Commercial">
+            {COMMERCIAL_SERVICES.map((s) => (
+              <option key={s.slug} value={s.name}>
+                {s.name}
+              </option>
+            ))}
+          </optgroup>
         </Select>
         <FieldError>{errors.service_type?.message}</FieldError>
       </div>

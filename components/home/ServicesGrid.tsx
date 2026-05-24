@@ -2,15 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import {
-  Snowflake,
-  Wind,
-  Flame,
-  Siren,
-  ShieldCheck,
-  Building2,
-  ArrowUpRight,
-} from 'lucide-react';
+import { Snowflake, Wind, Flame, Siren, ShieldCheck, Building2, ArrowUpRight } from 'lucide-react';
 
 const CARDS = [
   {
@@ -49,6 +41,12 @@ const CARDS = [
     description: 'Whole-house HVAC design for builders and renovators.',
     icon: Building2,
   },
+  {
+    href: '/commercial',
+    title: 'Commercial HVAC',
+    description: 'Full-service commercial — RTUs, VRF, chillers, boilers, BAS. At any scale.',
+    icon: Building2,
+  },
 ];
 
 export function ServicesGrid() {
@@ -58,7 +56,7 @@ export function ServicesGrid() {
         <div className="mb-14 max-w-2xl">
           <span className="eyebrow mb-4">What We Do</span>
           <h2 className="heading-section text-balance">
-            Every HVAC service your NJ home will ever need — under one roof.
+            Every HVAC service North Jersey homes and businesses will ever need — under one roof.
           </h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -81,7 +79,7 @@ export function ServicesGrid() {
                 <p className="mb-6 text-sm leading-relaxed text-steel-200">{card.description}</p>
                 <span className="mt-auto inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-ember-300 group-hover:text-ember-200">
                   Learn More
-                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </span>
               </Link>
             </motion.div>
