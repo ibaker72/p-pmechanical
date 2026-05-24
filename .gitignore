@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+build/
+.env
+.env.local
+.env*.local
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# next-sitemap output (regenerated on each build)
+public/sitemap.xml
+public/sitemap-*.xml
+public/robots.txt

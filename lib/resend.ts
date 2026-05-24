@@ -1,0 +1,86 @@
+import { Resend } from 'resend';
+import { BUSINESS } from './constants';
+
+let cached: Resend | null = null;
+
+function client(): Resend | null {
+  if (cached) return cached;
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  cached = new Resend(key);
+  return cached;
+}
+
+type LeadEmailPayload = {
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  service_type?: string | null;
+  home_size?: string | null;
+  system_age?: string | null;
+  message?: string | null;
+  source: string;
+  preferred_contact_time?: string | null;
+  city?: string | null;
+};
+
+const FROM = `${BUSINESS.name} <leads@ppmechanicalhvac.com>`;
+
+export async function sendOwnerNotification(lead: LeadEmailPayload) {
+  const c = client();
+  const to = process.env.OWNER_EMAIL;
+  if (!c || !to) return { skipped: true };
+
+  const rows = Object.entries(lead)
+    .filter(([, v]) => v !== null && v !== undefined && v !== '')
+    .map(
+      ([k, v]) =>
+        `<tr><td style="padding:6px 10px;border-bottom:1px solid #eee;font-weight:600;text-transform:capitalize;">${k.replace(/_/g, ' ')}</td><td style="padding:6px 10px;border-bottom:1px solid #eee;">${String(v)}</td></tr>`,
+    )
+    .join('');
+
+  return c.emails.send({
+    from: FROM,
+    to,
+    subject: `New lead: ${lead.name ?? 'Unknown'} — ${lead.service_type ?? lead.source}`,
+    html: `<div style="font-family:system-ui,sans-serif;max-width:600px;">
+      <h2 style="color:#dc5a06;">New Lead — ${lead.source}</h2>
+      <p>You received a new lead through the website.</p>
+      <table style="border-collapse:collapse;width:100%;">${rows}</table>
+      <p style="margin-top:24px;color:#555;font-size:13px;">Reply to this email or call the customer back within 2 hours for the best conversion rate.</p>
+    </div>`,
+  });
+}
+
+export async function sendCustomerConfirmation(lead: LeadEmailPayload) {
+  const c = client();
+  if (!c || !lead.email) return { skipped: true };
+  return c.emails.send({
+    from: FROM,
+    to: lead.email,
+    subject: `We received your request — ${BUSINESS.name}`,
+    html: `<div style="font-family:system-ui,sans-serif;max-width:600px;color:#111;">
+      <h2 style="color:#dc5a06;margin-bottom:8px;">Thanks${lead.name ? ', ' + lead.name : ''} — we got it.</h2>
+      <p>A member of the ${BUSINESS.name} team will reach out within <strong>2 hours</strong> during business hours (or first thing in the morning if you submitted overnight).</p>
+      <p>If your situation is an HVAC emergency — no heat, no AC, a gas smell, or a CO alarm — please call us right now at <a href="${BUSINESS.phoneHref}">${BUSINESS.phone}</a>. We dispatch 24/7.</p>
+      <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
+      <p style="font-size:13px;color:#555;">${BUSINESS.name}<br/>${BUSINESS.address.street}, ${BUSINESS.address.city}, ${BUSINESS.address.region} ${BUSINESS.address.postalCode}<br/>${BUSINESS.license}</p>
+    </div>`,
+  });
+}
+
+export async function sendSavingsGuide(email: string, name?: string) {
+  const c = client();
+  if (!c) return { skipped: true };
+  return c.emails.send({
+    from: FROM,
+    to: email,
+    subject: 'Your NJ Homeowner HVAC Savings Guide',
+    html: `<div style="font-family:system-ui,sans-serif;max-width:600px;color:#111;">
+      <h2 style="color:#dc5a06;">Here is your free guide${name ? ', ' + name : ''}.</h2>
+      <p>12 practical, NJ-specific ways to lower your energy bill before the next heating or cooling season.</p>
+      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalhvac.com'}/downloads/pp-hvac-savings-guide.pdf" style="display:inline-block;background:#dc5a06;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Download the Guide (PDF)</a></p>
+      <p style="margin-top:24px;color:#555;font-size:13px;">If you want a quote on any of the upgrades in the guide, hit reply — we will run the numbers for your home.</p>
+    </div>`,
+  });
+}
