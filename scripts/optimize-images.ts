@@ -7,7 +7,14 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import sharp from 'sharp';
+
+let sharp: any;
+try {
+  sharp = require('sharp');
+} catch {
+  console.error('[images] Error: sharp module not found. Install it with: npm install sharp');
+  process.exit(1);
+}
 
 const ROOT = path.join(process.cwd(), 'public', 'images');
 const EXT = new Set(['.jpg', '.jpeg', '.png']);
