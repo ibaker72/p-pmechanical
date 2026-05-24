@@ -34,7 +34,7 @@ A fast, modern, mobile-first website engineered as a 24/7 lead engine — not ju
 - **Services** — boiler, HVAC, heating, AC, maintenance, emergency
 - **Per-city landing pages** for every town you serve (Clifton, Passaic, Paterson, Montclair, Nutley, Bloomfield, and more) — each one optimized to rank locally
 - **About** — your story, your crew, why people in North Jersey trust you
-- **Free HVAC Homeowner's Guide** — a lead magnet that captures emails from people who aren't ready to buy *yet*
+- **Free HVAC Homeowner's Guide** — a lead magnet that captures emails from people who aren't ready to buy _yet_
 - **Blog** with seasonal, useful articles (already seeded with three pieces)
 - **FAQ** — answers the questions Google's AI wants to see answered
 - **Contact + Quote + Thank-you flow** — frictionless from click to confirmation
@@ -65,7 +65,7 @@ Your site ships with:
 - **Clean, semantic HTML** that AI crawlers love
 - **FAQ content written in question/answer format** — exactly what AI engines quote in their answers
 
-Result: when the AI revolution in local search finishes playing out (it's happening *now*), you're already in the answer.
+Result: when the AI revolution in local search finishes playing out (it's happening _now_), you're already in the answer.
 
 ---
 
@@ -88,7 +88,7 @@ If you ever miss a lead, it's not because the website dropped it.
 
 ## Built for trust
 
-Homeowners spending thousands on a new boiler need to *feel* safe before they call. The design choices reinforce that on every page:
+Homeowners spending thousands on a new boiler need to _feel_ safe before they call. The design choices reinforce that on every page:
 
 - Real photos of real work (slot ready for your job-site photography)
 - License & insurance badges
@@ -124,7 +124,7 @@ Homeowners spending thousands on a new boiler need to *feel* safe before they ca
 
 ## The bottom line
 
-Most HVAC contractor websites in North Jersey were built five to ten years ago, look it, and lose business every day because of it. This platform is the opposite — modern, fast, trustworthy, optimized for both Google *and* the new AI search wave, and engineered from line one to do the one job that matters:
+Most HVAC contractor websites in North Jersey were built five to ten years ago, over look it, and lose business every day because of it. This platform is the opposite — modern, fast, trustworthy, optimized for both Google _and_ the new AI search wave, and engineered from line one to do the one job that matters:
 
 **Get the phone ringing.**
 
