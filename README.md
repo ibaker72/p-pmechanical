@@ -28,19 +28,24 @@ The site runs at <http://localhost:3000>.
 
 ## Environment variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | yes | Full URL (e.g. `https://ppmechanicalhvac.com`) — used by metadata, sitemap, structured data. |
-| `SUPABASE_URL` | yes (for leads) | Supabase project URL |
-| `SUPABASE_ANON_KEY` | optional | (Not used server-side; included for any future client-side reads) |
-| `SUPABASE_SERVICE_ROLE_KEY` | yes (for leads) | Server-only key — never expose to client. Used by `/api/leads` to insert. |
-| `RESEND_API_KEY` | yes (for emails) | Resend API key for transactional email |
-| `OWNER_EMAIL` | yes (for emails) | Where new-lead notifications are sent |
-| `ADMIN_SECRET` | yes (for `/api/leads/list`) | Bearer token to protect the leads list endpoint |
-| `NEXT_PUBLIC_BUSINESS_PHONE` | optional | Overrides the placeholder phone if needed in client code |
-| `NEXT_PUBLIC_BUSINESS_PHONE_DISPLAY` | optional | Pretty-formatted display phone |
+| Variable                             | Required                    | Description                                                                                  |
+| ------------------------------------ | --------------------------- | -------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`               | yes                         | Full URL (e.g. `https://ppmechanicalhvac.com`) — used by metadata, sitemap, structured data. |
+| `SUPABASE_URL`                       | yes (for leads)             | Supabase project URL                                                                         |
+| `SUPABASE_ANON_KEY`                  | optional                    | (Not used server-side; included for any future client-side reads)                            |
+| `SUPABASE_SERVICE_ROLE_KEY`          | yes (for leads)             | Server-only key — never expose to client. Used by `/api/leads` to insert.                    |
+| `RESEND_API_KEY`                     | yes (for emails)            | Resend API key for transactional email                                                       |
+| `OWNER_EMAIL`                        | yes (for emails)            | Where new-lead notifications are sent                                                        |
+| `ADMIN_SECRET`                       | yes (for `/api/leads/list`) | Bearer token to protect the leads list endpoint                                              |
+| `UPSTASH_REDIS_REST_URL`             | yes in prod                 | Upstash Redis REST URL — backs rate limiting and idempotency on `/api/leads*`.               |
+| `UPSTASH_REDIS_REST_TOKEN`           | yes in prod                 | Upstash Redis REST token.                                                                    |
+| `WEBHOOK_SECRET`                     | optional                    | If set, `/api/leads/webhook` requires `X-Webhook-Secret` to match.                           |
+| `OUTBOUND_WEBHOOK_URL`               | optional                    | Where to POST `lead.created` events (e.g. OpenClaw, n8n, Make, Zapier).                      |
+| `OUTBOUND_WEBHOOK_SECRET`            | optional                    | HMAC-SHA256 key used to sign the outbound event payload (in `X-Signature`).                  |
+| `NEXT_PUBLIC_BUSINESS_PHONE`         | optional                    | Overrides the placeholder phone if needed in client code                                     |
+| `NEXT_PUBLIC_BUSINESS_PHONE_DISPLAY` | optional                    | Pretty-formatted display phone                                                               |
 
-The site degrades gracefully — if Supabase or Resend env vars are missing, the form will still respond successfully and the API endpoint will return a `warning` field. Configure properly before launch.
+The site degrades gracefully — if Supabase, Resend, or Upstash env vars are missing, the form will still respond successfully and the API endpoint will return a `warnings` array. Configure properly before launch. The schema is enforced by `npm run validate:env` (auto-run in `prebuild`).
 
 ---
 
@@ -91,6 +96,7 @@ All forms POST to `/api/leads` with:
 ```
 
 On success:
+
 1. Row inserted to `leads` table
 2. Email sent to `OWNER_EMAIL` (lead summary)
 3. Email sent to the customer (confirmation)
@@ -99,6 +105,27 @@ On success:
 ### External webhook
 
 The same endpoint is aliased at `/api/leads/webhook` for stable integration with external automation tools (GoHighLevel, OpenClaw, Zapier, Make, etc.). POST with the same body.
+
+**Hardening (all opt-in via env vars):**
+
+- **Honeypot**: every form includes a hidden `website_url` field. Any submission with a non-empty value is silently dropped (returns 200, never written).
+- **Rate limiting** (Upstash): form submissions are limited to 10/min per IP; webhook submissions to 60/min per secret. Set `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` to enable.
+- **Webhook auth**: set `WEBHOOK_SECRET` and present the same value in the `X-Webhook-Secret` header on every webhook POST.
+- **Idempotency**: clients may pass `Idempotency-Key: <uuid>` — the API returns the original `lead_id` on retries within a 24-hour window.
+
+Response shape:
+
+```json
+{
+  "ok": true,
+  "lead_id": "uuid|null",
+  "stored": true,
+  "created_at": "2025-05-24T...",
+  "idempotent": false,
+  "emails": { "owner": "sent|failed|skipped", "customer": "sent|failed|skipped" },
+  "warnings": ["…"]
+}
+```
 
 ### Admin: viewing leads
 
@@ -205,10 +232,95 @@ Search the codebase for `// TODO:` comments — these mark business-specific val
 ## Lint & build
 
 ```bash
-npm run lint     # Next/ESLint
-npm run build    # Production build
-npm run start    # Run prod build locally
+npm run lint            # Next/ESLint
+npm run type-check      # tsc --noEmit
+npm run format          # prettier --write .
+npm run validate:env    # Zod-validates env vars (also runs in prebuild)
+npm run validate:content # Lints MDX frontmatter and body length
+npm run analyze         # Bundle analyzer (ANALYZE=true next build)
+npm run build           # Production build
+npm run start           # Run prod build locally
+npm run new:post -- "Post Title"  # Scaffold a new MDX blog post
+npm run leads:export -- --days 90 # Export leads from Supabase to CSV
+npm run images:optimize           # Convert public/images/** to WebP+AVIF
 ```
+
+Pre-commit hooks run via [lefthook](https://github.com/evilmartians/lefthook):
+
+```bash
+npx lefthook install
+```
+
+---
+
+## Agents & Automation
+
+This site exposes a first-class surface for autonomous agents (OpenClaw, custom Claude/GPT agents, n8n, Make, Zapier, GoHighLevel). An agent can discover the site, read its services, and submit leads without ever scraping HTML.
+
+### Discovery
+
+| URL                       | Purpose                                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------- |
+| `/.well-known/agent.json` | Machine-readable manifest — capabilities, auth, rate limits, action schemas.          |
+| `/api/services`           | JSON: business info, every service, every service area with geo.                      |
+| `/llms.txt`               | Short markdown summary for AI answer engines (Claude, ChatGPT, Perplexity, Gemini).   |
+| `/llms-full.txt`          | Long-form bundle: every service, location, FAQ, review, blog excerpt — for grounding. |
+| `/ai.txt`                 | Crawler directive (permissions + attribution preference).                             |
+| `/sitemap.xml`            | Standard sitemap.                                                                     |
+| `/robots.txt`             | Standard robots.                                                                      |
+
+### Submitting a lead (OpenClaw / any agent)
+
+```bash
+curl -X POST https://ppmechanicalhvac.com/api/leads/webhook \
+  -H "Content-Type: application/json" \
+  -H "X-Webhook-Secret: $WEBHOOK_SECRET" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -d '{
+    "name": "Jane Smith",
+    "phone": "(973) 555-0123",
+    "email": "jane@example.com",
+    "service_type": "Boiler Installation",
+    "city": "Clifton",
+    "message": "Need a quote on replacing my 1990s gas boiler.",
+    "source": "openclaw"
+  }'
+```
+
+The response is machine-friendly:
+
+```json
+{ "ok": true, "lead_id": "…", "stored": true, "created_at": "…", "idempotent": false }
+```
+
+Retrying the same `Idempotency-Key` within 24h returns the original `lead_id` instead of creating a duplicate.
+
+### Receiving `lead.created` events
+
+Set `OUTBOUND_WEBHOOK_URL` (and ideally `OUTBOUND_WEBHOOK_SECRET`) and the site will POST every successful lead to your endpoint:
+
+```json
+{
+  "type": "lead.created",
+  "occurred_at": "2025-05-24T17:00:00.000Z",
+  "lead_id": "uuid",
+  "lead": { "name": "…", "phone": "…", "source": "contact_form", "...": "..." }
+}
+```
+
+The payload is signed with HMAC-SHA256 in the `X-Signature` header (`t={unix_ms},v1={hex_digest}`). Verify with:
+
+```ts
+import crypto from 'node:crypto';
+const [t, v1] = req.headers['x-signature'].split(',').map((p) => p.split('=')[1]);
+const expected = crypto
+  .createHmac('sha256', process.env.OUTBOUND_WEBHOOK_SECRET)
+  .update(rawBody)
+  .digest('hex');
+const valid = crypto.timingSafeEqual(Buffer.from(v1), Buffer.from(expected));
+```
+
+Outbound POSTs are fire-and-forget with a 5-second timeout — a slow or failing OpenClaw endpoint never blocks a lead capture.
 
 ---
 

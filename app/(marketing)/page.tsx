@@ -8,11 +8,13 @@ import { Testimonials } from '@/components/home/Testimonials';
 import { EmergencyCTA } from '@/components/home/EmergencyCTA';
 import { BlogPreview } from '@/components/home/BlogPreview';
 import { LocalBusinessSchema } from '@/components/seo/JsonLd';
+import { ReviewSchema } from '@/components/seo/ReviewSchema';
 
 export default function HomePage() {
   return (
     <>
       <LocalBusinessSchema />
+      <ReviewSchema />
       <Hero />
       <StatsBar />
       <ServicesGrid />

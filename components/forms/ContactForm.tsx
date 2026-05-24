@@ -8,16 +8,15 @@ import { Input, Textarea, Select, Label, FieldError } from '@/components/ui/inpu
 import { Button } from '@/components/ui/button';
 import { contactSchema, type ContactInput } from '@/lib/validations';
 import { SERVICES, ALL_SERVICE_AREAS } from '@/lib/constants';
+import { Honeypot, readHoneypot } from './Honeypot';
+import { trackLead } from '@/lib/analytics';
 
 type ContactFormProps = {
   defaultCity?: string;
   source?: string;
 };
 
-export function ContactForm({
-  defaultCity,
-  source = 'contact_form',
-}: ContactFormProps = {}) {
+export function ContactForm({ defaultCity, source = 'contact_form' }: ContactFormProps = {}) {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const {
@@ -30,8 +29,9 @@ export function ContactForm({
     defaultValues: defaultCity ? { city: defaultCity } : undefined,
   });
 
-  async function onSubmit(values: ContactInput) {
+  async function onSubmit(values: ContactInput, event?: React.BaseSyntheticEvent) {
     setStatus('submitting');
+    const hp = readHoneypot(event);
     try {
       const res = await fetch('/api/leads', {
         method: 'POST',
@@ -40,10 +40,16 @@ export function ContactForm({
           ...values,
           city: values.city || defaultCity || null,
           source,
+          website_url: hp,
         }),
       });
       if (!res.ok) throw new Error('Submission failed');
       setStatus('success');
+      trackLead({
+        source,
+        service_type: values.service_type ?? undefined,
+        city: values.city ?? defaultCity,
+      });
       reset();
     } catch (e) {
       setStatus('error');
@@ -57,7 +63,8 @@ export function ContactForm({
         <CheckCircle2 className="h-12 w-12 text-ember-300" />
         <p className="font-display text-3xl text-white">Thanks — we got it.</p>
         <p className="max-w-md text-sm text-steel-100">
-          A team member will reach out within 2 hours during business hours. If your issue is an emergency, please call our 24/7 line.
+          A team member will reach out within 2 hours during business hours. If your issue is an
+          emergency, please call our 24/7 line.
         </p>
       </div>
     );
@@ -65,6 +72,7 @@ export function ContactForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <Honeypot />
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <Label htmlFor="c-name">Name</Label>
@@ -133,7 +141,9 @@ export function ContactForm({
         </Button>
       </div>
       {status === 'error' && (
-        <p className="text-sm text-ember-300">{errorMsg || 'Please try again or call us directly.'}</p>
+        <p className="text-sm text-ember-300">
+          {errorMsg || 'Please try again or call us directly.'}
+        </p>
       )}
     </form>
   );

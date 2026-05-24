@@ -2,19 +2,45 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
-  Wrench, Cog, Flame, Thermometer, Snowflake, Wind, Siren, ShieldCheck,
-  Check, ArrowRight, Phone, MapPin,
+  Wrench,
+  Cog,
+  Flame,
+  Thermometer,
+  Snowflake,
+  Wind,
+  Siren,
+  ShieldCheck,
+  Check,
+  ArrowRight,
+  Phone,
+  MapPin,
 } from 'lucide-react';
 import { SERVICES, BUSINESS } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import {
-  Accordion, AccordionItem, AccordionTrigger, AccordionContent,
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
 } from '@/components/ui/accordion';
 import { InlineLeadForm } from '@/components/forms/InlineLeadForm';
-import { ServiceSchema, FaqSchema, BreadcrumbSchema, LocalBusinessSchema } from '@/components/seo/JsonLd';
+import {
+  ServiceSchema,
+  FaqSchema,
+  BreadcrumbSchema,
+  LocalBusinessSchema,
+} from '@/components/seo/JsonLd';
+import { HowToSchema } from '@/components/seo/HowToSchema';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  Wrench, Cog, Flame, Thermometer, Snowflake, Wind, Siren, ShieldCheck,
+  Wrench,
+  Cog,
+  Flame,
+  Thermometer,
+  Snowflake,
+  Wind,
+  Siren,
+  ShieldCheck,
 };
 
 export function generateStaticParams() {
@@ -26,7 +52,11 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   if (!s) return {};
   return {
     title: `${s.name} in Clifton, NJ`,
-    description: `${s.short} P&P Mechanical serves Clifton, Passaic County, and surrounding North Jersey areas with same-day service.`.slice(0, 158),
+    description:
+      `${s.short} P&P Mechanical serves Clifton, Passaic County, and surrounding North Jersey areas with same-day service.`.slice(
+        0,
+        158,
+      ),
     alternates: { canonical: `/services/${s.slug}` },
     openGraph: {
       title: `${s.name} in Clifton, NJ | ${BUSINESS.name}`,
@@ -46,6 +76,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
     <>
       <LocalBusinessSchema />
       <ServiceSchema name={service.name} description={service.short} slug={service.slug} />
+      <HowToSchema name={service.name} description={service.short} steps={service.process} />
       <FaqSchema faqs={service.faqs} />
       <BreadcrumbSchema
         items={[
@@ -58,12 +89,22 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-white/10 py-20 sm:py-28">
         <div aria-hidden className="absolute inset-0 bg-hero-noise opacity-90" />
-        <div aria-hidden className="absolute inset-0 bg-grid-faint bg-[length:64px_64px] opacity-20" />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-grid-faint bg-[length:64px_64px] opacity-20"
+        />
         <div className="container-wide relative">
-          <nav aria-label="Breadcrumb" className="mb-6 text-xs uppercase tracking-widest text-steel-300">
-            <Link href="/" className="hover:text-ember-300">Home</Link>
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-6 text-xs uppercase tracking-widest text-steel-300"
+          >
+            <Link href="/" className="hover:text-ember-300">
+              Home
+            </Link>
             <span className="px-2">/</span>
-            <Link href="/services" className="hover:text-ember-300">Services</Link>
+            <Link href="/services" className="hover:text-ember-300">
+              Services
+            </Link>
             <span className="px-2">/</span>
             <span className="text-white">{service.name}</span>
           </nav>
@@ -117,7 +158,8 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
               {service.startingPrice || 'Custom quote'}
             </p>
             <p className="mt-2 text-sm text-steel-200">
-              We give you a firm, written, flat-rate price before any work begins — never an hourly meter.
+              We give you a firm, written, flat-rate price before any work begins — never an hourly
+              meter.
             </p>
             <Button asChild size="md" variant="primary" className="mt-6 w-full">
               <Link href="/quote">Get Your Quote</Link>
@@ -198,9 +240,12 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         <div className="container-wide grid gap-12 lg:grid-cols-3">
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 lg:col-span-1">
             <MapPin className="mb-3 h-6 w-6 text-ember-400" />
-            <h3 className="font-display text-2xl text-white">Serving Clifton, NJ and surrounding areas</h3>
+            <h3 className="font-display text-2xl text-white">
+              Serving Clifton, NJ and surrounding areas
+            </h3>
             <p className="mt-3 text-steel-200">
-              Our dispatch is based in Clifton, with tight arrival windows across Passaic and Essex counties.
+              Our dispatch is based in Clifton, with tight arrival windows across Passaic and Essex
+              counties.
             </p>
             <Button asChild variant="outline" size="md" className="mt-5">
               <Link href="/locations">See all service areas</Link>

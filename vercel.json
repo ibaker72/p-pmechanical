@@ -1,0 +1,23 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["iad1"],
+  "github": {
+    "silent": true
+  },
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/sitemap", "destination": "/sitemap.xml", "permanent": true },
+    {
+      "source": "/services/hvac",
+      "destination": "/services/hvac-installation",
+      "permanent": false
+    },
+    { "source": "/ac", "destination": "/services/ac-installation", "permanent": false },
+    { "source": "/boiler", "destination": "/services/boiler-installation", "permanent": false },
+    { "source": "/emergency", "destination": "/services/emergency-hvac", "permanent": false },
+    { "source": "/locations/clifton", "destination": "/locations/clifton-nj", "permanent": true },
+    { "source": "/locations/passaic", "destination": "/locations/passaic-nj", "permanent": true },
+    { "source": "/locations/paterson", "destination": "/locations/paterson-nj", "permanent": true }
+  ]
+}

@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint · Type-check · Content · Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    env:
+      # Synthetic values so prebuild / build succeed without secrets.
+      NEXT_PUBLIC_SITE_URL: https://ppmechanicalhvac.com
+      NODE_ENV: development
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Validate content
+        run: npm run validate:content
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://ppmechanicalhvac.com
+
+      - name: Upload Next build cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            .next/cache
+          key: next-cache-${{ hashFiles('**/package-lock.json') }}-${{ github.sha }}

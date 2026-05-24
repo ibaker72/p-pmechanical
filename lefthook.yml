@@ -1,0 +1,27 @@
+# Git hooks managed by lefthook. Install once with `npx lefthook install`.
+
+pre-commit:
+  parallel: true
+  commands:
+    eslint:
+      glob: '*.{ts,tsx,js,jsx}'
+      run: npx next lint --fix --file {staged_files}
+      stage_fixed: true
+    prettier:
+      glob: '*.{ts,tsx,js,jsx,json,md,mdx,css,yml,yaml}'
+      run: npx prettier --write {staged_files}
+      stage_fixed: true
+
+pre-push:
+  commands:
+    type-check:
+      run: npm run type-check
+
+commit-msg:
+  commands:
+    conventional-nudge:
+      # Soft nudge — never blocks. Helps maintain a readable history.
+      run: |
+        if ! grep -qiE "^(feat|fix|chore|docs|refactor|test|perf|build|ci|style|revert)(\\(.+\\))?!?:" {1}; then
+          echo "[lefthook] tip: conventional commits (feat:, fix:, chore:, …) read nicely in the log."
+        fi

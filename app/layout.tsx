@@ -1,7 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import { Barlow_Condensed, DM_Sans } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { BUSINESS } from '@/lib/constants';
 import { HvacBusinessSchema } from '@/components/seo/HvacBusinessSchema';
+import { OrganizationSchema } from '@/components/seo/OrganizationSchema';
+import { WebVitals } from '@/components/analytics/WebVitals';
 import { StickyMobileCTA } from '@/components/StickyMobileCTA';
 import './globals.css';
 
@@ -54,8 +58,23 @@ export const metadata: Metadata = {
     description: '24/7 emergency HVAC, boiler, and AC service across North Jersey.',
     images: ['/og-default.png'],
   },
-  robots: { index: true, follow: true },
+  // Opens up rich-snippet eligibility in both Google SERPs and AI answer
+  // surfaces (ChatGPT/Perplexity quote longer excerpts when allowed).
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
   alternates: { canonical: SITE_URL },
+  other: {
+    'format-detection': 'telephone=no',
+  },
 };
 
 export const viewport: Viewport = {
@@ -69,11 +88,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <head>
         <HvacBusinessSchema />
+        <OrganizationSchema />
+        <link
+          rel="alternate"
+          type="text/plain"
+          title="LLM-friendly site summary"
+          href="/llms.txt"
+        />
       </head>
       <body className="pb-[72px] md:pb-0">
-        <a href="#main" className="skip-link">Skip to content</a>
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
         {children}
         <StickyMobileCTA />
+        <WebVitals />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

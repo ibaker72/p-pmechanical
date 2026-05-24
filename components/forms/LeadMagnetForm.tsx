@@ -7,6 +7,8 @@ import { Download, Loader2, CheckCircle2 } from 'lucide-react';
 import { Input, FieldError } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { savingsGuideSchema, type SavingsGuideInput } from '@/lib/validations';
+import { Honeypot, readHoneypot } from './Honeypot';
+import { trackLead } from '@/lib/analytics';
 
 export function LeadMagnetForm({ compact = false }: { compact?: boolean }) {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
@@ -19,17 +21,19 @@ export function LeadMagnetForm({ compact = false }: { compact?: boolean }) {
     formState: { errors },
   } = useForm<SavingsGuideInput>({ resolver: zodResolver(savingsGuideSchema) });
 
-  async function onSubmit(values: SavingsGuideInput) {
+  async function onSubmit(values: SavingsGuideInput, event?: React.BaseSyntheticEvent) {
     setStatus('submitting');
     setErrorMsg('');
+    const hp = readHoneypot(event);
     try {
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...values, source: 'savings_guide' }),
+        body: JSON.stringify({ ...values, source: 'savings_guide', website_url: hp }),
       });
       if (!res.ok) throw new Error('Submission failed');
       setStatus('success');
+      trackLead({ source: 'savings_guide' });
       reset();
     } catch (e) {
       setStatus('error');
@@ -43,7 +47,8 @@ export function LeadMagnetForm({ compact = false }: { compact?: boolean }) {
         <CheckCircle2 className="h-8 w-8 text-ember-300" />
         <p className="font-display text-2xl text-white">Check your inbox.</p>
         <p className="max-w-md text-sm text-steel-100">
-          Your free NJ Homeowner&apos;s HVAC Savings Guide is on the way. If you don&apos;t see it in 2 minutes, check your spam folder.
+          Your free NJ Homeowner&apos;s HVAC Savings Guide is on the way. If you don&apos;t see it
+          in 2 minutes, check your spam folder.
         </p>
       </div>
     );
@@ -58,6 +63,7 @@ export function LeadMagnetForm({ compact = false }: { compact?: boolean }) {
           : 'mx-auto flex w-full max-w-xl flex-col gap-4 rounded-xl bg-ink-950/40 p-6 backdrop-blur-md sm:flex-row sm:items-start'
       }
     >
+      <Honeypot />
       <div className="flex-1">
         <Input
           type="text"

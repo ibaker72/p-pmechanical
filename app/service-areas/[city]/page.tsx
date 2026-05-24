@@ -14,39 +14,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { ContactForm } from '@/components/forms/ContactForm';
 import { LocalBusinessSchema, BreadcrumbSchema } from '@/components/seo/JsonLd';
+import { TARGET_CITIES, type TargetCitySlug, formatCitySlug } from './cities';
 
 const DISPATCH_PHONE_DISPLAY = '(201) 456-5151';
 const DISPATCH_PHONE_HREF = 'tel:+12014565151';
-
-export const TARGET_CITIES = [
-  'clifton',
-  'passaic',
-  'paterson',
-  'wayne',
-  'bloomfield',
-  'montclair',
-  'nutley',
-  'east-orange',
-] as const;
-
-export type TargetCitySlug = (typeof TARGET_CITIES)[number];
-
-export function formatCitySlug(slug: string): string {
-  return slug
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
 
 export function generateStaticParams() {
   return TARGET_CITIES.map((city) => ({ city }));
 }
 
-export function generateMetadata({
-  params,
-}: {
-  params: { city: string };
-}): Metadata {
+export function generateMetadata({ params }: { params: { city: string } }): Metadata {
   if (!TARGET_CITIES.includes(params.city as TargetCitySlug)) return {};
   const cityName = formatCitySlug(params.city);
   const title = `Premium HVAC, Boiler & AC Services in ${cityName}, NJ`;
@@ -87,11 +64,7 @@ const TRUST_POINTS = [
   { icon: MapPin, label: 'Local Crews, Fast Arrival' },
 ];
 
-export default function ServiceAreaCityPage({
-  params,
-}: {
-  params: { city: string };
-}) {
+export default function ServiceAreaCityPage({ params }: { params: { city: string } }) {
   if (!TARGET_CITIES.includes(params.city as TargetCitySlug)) notFound();
 
   const cityName = formatCitySlug(params.city);
@@ -135,25 +108,21 @@ export default function ServiceAreaCityPage({
             Now Serving {cityName} · Passaic & Essex Counties
           </div>
 
-          <h1 className="mt-4 heading-display text-balance">
+          <h1 className="heading-display mt-4 text-balance">
             Premium HVAC, Boiler, & AC Services in{' '}
             <span className="text-ember-400">{cityName}</span>, NJ
           </h1>
 
           <p className="mt-6 max-w-3xl text-lg leading-relaxed text-steel-100">
-            Providing 24/7 emergency dispatch and precision install jobs to
-            homeowners across {cityName} and the surrounding Passaic and Essex
-            County neighborhoods. Real techs, transparent flat-rate pricing,
-            and equipment sized to your home — not guessed from a brochure.
+            Providing 24/7 emergency dispatch and precision install jobs to homeowners across{' '}
+            {cityName} and the surrounding Passaic and Essex County neighborhoods. Real techs,
+            transparent flat-rate pricing, and equipment sized to your home — not guessed from a
+            brochure.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" variant="emergency">
-              <a
-                href={DISPATCH_PHONE_HREF}
-                data-cta="city-hero-call"
-                data-city={cityName}
-              >
+              <a href={DISPATCH_PHONE_HREF} data-cta="city-hero-call" data-city={cityName}>
                 <Phone className="h-4 w-4" /> Call {DISPATCH_PHONE_DISPLAY}
               </a>
             </Button>
@@ -193,10 +162,9 @@ export default function ServiceAreaCityPage({
               Full-service HVAC for {cityName} homeowners.
             </h2>
             <p className="mt-4 text-steel-200">
-              From cast-iron boiler swaps in older {cityName} homes to
-              high-efficiency central AC retrofits, our NJ-licensed crews
-              handle the work end-to-end — permits, install, and a clean
-              walkthrough.
+              From cast-iron boiler swaps in older {cityName} homes to high-efficiency central AC
+              retrofits, our NJ-licensed crews handle the work end-to-end — permits, install, and a
+              clean walkthrough.
             </p>
           </div>
 
@@ -209,12 +177,8 @@ export default function ServiceAreaCityPage({
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-ember-500/10 text-ember-400 ring-1 ring-ember-500/30">
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="mt-5 font-display text-2xl font-semibold text-white">
-                  {title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-steel-200">
-                  {copy}
-                </p>
+                <h3 className="mt-5 font-display text-2xl font-semibold text-white">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-steel-200">{copy}</p>
               </article>
             ))}
           </div>
@@ -232,16 +196,12 @@ export default function ServiceAreaCityPage({
               24/7 emergency dispatch to {cityName}.
             </h2>
             <p className="mt-2 max-w-xl text-steel-100">
-              Talk to a real technician in under 60 seconds — most calls land a
-              truck at your door inside two hours.
+              Talk to a real technician in under 60 seconds — most calls land a truck at your door
+              inside two hours.
             </p>
           </div>
           <Button asChild size="lg" variant="primary">
-            <a
-              href={DISPATCH_PHONE_HREF}
-              data-cta="city-emergency-call"
-              data-city={cityName}
-            >
+            <a href={DISPATCH_PHONE_HREF} data-cta="city-emergency-call" data-city={cityName}>
               <Phone className="h-4 w-4" /> Tap to Call {DISPATCH_PHONE_DISPLAY}
             </a>
           </Button>
@@ -259,9 +219,8 @@ export default function ServiceAreaCityPage({
               Get a free, no-pressure estimate.
             </h2>
             <p className="mt-4 text-steel-200">
-              Tell us what you need and we&apos;ll dispatch a technician to
-              your {cityName} address. We respond within two hours during
-              business windows — and 24/7 for true emergencies.
+              Tell us what you need and we&apos;ll dispatch a technician to your {cityName} address.
+              We respond within two hours during business windows — and 24/7 for true emergencies.
             </p>
             <div className="mt-8 space-y-3 text-sm text-steel-100">
               <p className="flex items-center gap-3">

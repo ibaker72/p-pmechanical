@@ -8,6 +8,8 @@ import { Input, Textarea, Select, Label, FieldError } from '@/components/ui/inpu
 import { Button } from '@/components/ui/button';
 import { inlineLeadSchema, type InlineLeadInput } from '@/lib/validations';
 import { SERVICES } from '@/lib/constants';
+import { Honeypot, readHoneypot } from './Honeypot';
+import { trackLead } from '@/lib/analytics';
 
 export function InlineLeadForm({
   defaultService,
@@ -31,16 +33,18 @@ export function InlineLeadForm({
     defaultValues: { service_type: defaultService || '' },
   });
 
-  async function onSubmit(values: InlineLeadInput) {
+  async function onSubmit(values: InlineLeadInput, event?: React.BaseSyntheticEvent) {
     setStatus('submitting');
+    const hp = readHoneypot(event);
     try {
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...values, city, source }),
+        body: JSON.stringify({ ...values, city, source, website_url: hp }),
       });
       if (!res.ok) throw new Error('Submission failed');
       setStatus('success');
+      trackLead({ source, service_type: values.service_type, city });
       reset();
     } catch (e) {
       setStatus('error');
@@ -54,7 +58,8 @@ export function InlineLeadForm({
         <CheckCircle2 className="h-10 w-10 text-ember-300" />
         <p className="font-display text-2xl text-white">Request received.</p>
         <p className="max-w-md text-sm text-steel-100">
-          A team member will call you within 2 hours during business hours. For urgent issues, please call us directly.
+          A team member will call you within 2 hours during business hours. For urgent issues,
+          please call us directly.
         </p>
       </div>
     );
@@ -62,6 +67,7 @@ export function InlineLeadForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 sm:grid-cols-2">
+      <Honeypot />
       <div>
         <Label htmlFor="il-name">Name</Label>
         <Input id="il-name" placeholder="Jane Smith" {...register('name')} />
@@ -98,10 +104,8 @@ export function InlineLeadForm({
         />
         <FieldError>{errors.message?.message}</FieldError>
       </div>
-      <div className="sm:col-span-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-steel-300">
-          We respond within 2 hours during business hours.
-        </p>
+      <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-steel-300">We respond within 2 hours during business hours.</p>
         <Button type="submit" size="lg" variant="primary" disabled={status === 'submitting'}>
           {status === 'submitting' ? (
             <>
@@ -115,7 +119,7 @@ export function InlineLeadForm({
         </Button>
       </div>
       {status === 'error' && (
-        <p className="sm:col-span-2 text-sm text-ember-300">
+        <p className="text-sm text-ember-300 sm:col-span-2">
           {errorMsg || 'Something went wrong — please call us instead.'}
         </p>
       )}

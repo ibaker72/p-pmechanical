@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { trackLead } from '@/lib/analytics';
 import {
   ArrowLeft,
   ArrowRight,
@@ -29,7 +30,13 @@ const SERVICE_OPTIONS = [
 ];
 
 const HOME_SIZES = ['Under 1,000 sqft', '1,000 – 2,000 sqft', '2,000 – 3,500 sqft', '3,500+ sqft'];
-const SYSTEM_AGES = ['Less than 5 years', '5 – 10 years', '10 – 15 years', '15+ years', 'No system installed'];
+const SYSTEM_AGES = [
+  'Less than 5 years',
+  '5 – 10 years',
+  '10 – 15 years',
+  '15+ years',
+  'No system installed',
+];
 const TIME_PREFS = ['Morning (8a–12p)', 'Afternoon (12p–5p)', 'Evening (5p–8p)', 'Anytime today'];
 
 export function QuoteWizard() {
@@ -39,6 +46,7 @@ export function QuoteWizard() {
   const [errors, setErrors] = useState<Partial<Record<keyof QuoteWizardInput, string>>>({});
   const [status, setStatus] = useState<'idle' | 'submitting' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const honeypotRef = useRef<HTMLInputElement | null>(null);
 
   const totalSteps = 4;
 
@@ -67,13 +75,15 @@ export function QuoteWizard() {
       return;
     }
     setStatus('submitting');
+    const hp = honeypotRef.current?.value || '';
     try {
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...parsed.data, source: 'quote_wizard' }),
+        body: JSON.stringify({ ...parsed.data, source: 'quote_wizard', website_url: hp }),
       });
       if (!res.ok) throw new Error('Submission failed');
+      trackLead({ source: 'quote_wizard', service_type: parsed.data.service_type });
       router.push('/thank-you');
     } catch (e) {
       setStatus('error');
@@ -83,11 +93,30 @@ export function QuoteWizard() {
 
   return (
     <div className="mx-auto w-full max-w-3xl">
+      <div
+        aria-hidden="true"
+        style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, overflow: 'hidden' }}
+      >
+        <label>
+          Website (leave blank)
+          <input
+            ref={honeypotRef}
+            type="text"
+            name="website_url"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </label>
+      </div>
       {/* Progress bar */}
       <div className="mb-10">
         <div className="mb-2 flex items-center justify-between text-xs font-bold uppercase tracking-widest">
-          <span className="text-ember-300">Step {step + 1} of {totalSteps}</span>
-          <span className="text-steel-300">{Math.round(((step + 1) / totalSteps) * 100)}% complete</span>
+          <span className="text-ember-300">
+            Step {step + 1} of {totalSteps}
+          </span>
+          <span className="text-steel-300">
+            {Math.round(((step + 1) / totalSteps) * 100)}% complete
+          </span>
         </div>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
           <motion.div
@@ -128,7 +157,9 @@ export function QuoteWizard() {
                             : 'border-white/10 bg-white/[0.02] hover:border-ember-400/50 hover:bg-white/[0.05]'
                         }`}
                       >
-                        <opt.icon className={`h-7 w-7 ${selected ? 'text-ember-300' : 'text-ember-400'}`} />
+                        <opt.icon
+                          className={`h-7 w-7 ${selected ? 'text-ember-300' : 'text-ember-400'}`}
+                        />
                         <span className="font-display text-lg text-white">{opt.label}</span>
                       </button>
                     );
@@ -158,7 +189,9 @@ export function QuoteWizard() {
                             : 'border-white/10 bg-white/[0.02] hover:border-ember-400/50'
                         }`}
                       >
-                        <HomeIcon className={`h-5 w-5 ${selected ? 'text-ember-300' : 'text-ember-400'}`} />
+                        <HomeIcon
+                          className={`h-5 w-5 ${selected ? 'text-ember-300' : 'text-ember-400'}`}
+                        />
                         <span className="font-medium text-white">{opt}</span>
                       </button>
                     );
@@ -188,7 +221,9 @@ export function QuoteWizard() {
                             : 'border-white/10 bg-white/[0.02] hover:border-ember-400/50'
                         }`}
                       >
-                        <Calendar className={`h-5 w-5 ${selected ? 'text-ember-300' : 'text-ember-400'}`} />
+                        <Calendar
+                          className={`h-5 w-5 ${selected ? 'text-ember-300' : 'text-ember-400'}`}
+                        />
                         <span className="font-medium text-white">{opt}</span>
                       </button>
                     );
@@ -242,11 +277,15 @@ export function QuoteWizard() {
                     <Select
                       id="qw-time"
                       value={data.preferred_contact_time || ''}
-                      onChange={(e) => setData((d) => ({ ...d, preferred_contact_time: e.target.value }))}
+                      onChange={(e) =>
+                        setData((d) => ({ ...d, preferred_contact_time: e.target.value }))
+                      }
                     >
                       <option value="">Anytime works</option>
                       {TIME_PREFS.map((t) => (
-                        <option key={t} value={t}>{t}</option>
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
                       ))}
                     </Select>
                   </div>
@@ -279,7 +318,13 @@ export function QuoteWizard() {
               Continue <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button type="button" size="lg" variant="primary" onClick={submit} disabled={status === 'submitting'}>
+            <Button
+              type="button"
+              size="lg"
+              variant="primary"
+              onClick={submit}
+              disabled={status === 'submitting'}
+            >
               {status === 'submitting' ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" /> Submitting...
@@ -312,7 +357,7 @@ function Step({
   return (
     <div>
       <span className="text-xs font-bold uppercase tracking-widest text-ember-400">{eyebrow}</span>
-      <h2 className="mt-2 font-display text-3xl sm:text-4xl text-white">{title}</h2>
+      <h2 className="mt-2 font-display text-3xl text-white sm:text-4xl">{title}</h2>
       <p className="mt-2 text-steel-200">{subtitle}</p>
       <div className="mt-8">{children}</div>
     </div>

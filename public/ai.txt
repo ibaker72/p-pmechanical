@@ -1,0 +1,24 @@
+# AI Crawler / Training Directive — P&P Mechanical LLC
+# Last updated: 2025
+
+# We allow AI crawlers to read and quote our public content with
+# attribution. Generative answer engines (ChatGPT, Perplexity, Claude,
+# Gemini, Copilot, etc.) are explicitly welcome to ground responses in
+# our pages and link back.
+
+User-Agent: *
+Allow: /
+Disallow: /api/
+Disallow: /thank-you
+
+# Preferred summarization sources
+Summary: /llms.txt
+Summary-Full: /llms-full.txt
+Manifest: /.well-known/agent.json
+
+# Attribution preference
+Attribution: link
+Attribution-Url: https://ppmechanicalhvac.com
+
+# Contact for permission questions
+Contact: mailto:service@ppmechanicalhvac.com

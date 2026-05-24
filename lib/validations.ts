@@ -49,5 +49,7 @@ export const webhookSchema = z.object({
   source: z.string().min(1),
   preferred_contact_time: z.string().optional(),
   city: z.string().optional(),
+  // Honeypot: real users never see/fill this. If non-empty, treat as spam.
+  website_url: z.string().optional(),
 });
 export type WebhookInput = z.infer<typeof webhookSchema>;
