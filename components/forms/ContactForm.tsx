@@ -9,7 +9,15 @@ import { Button } from '@/components/ui/button';
 import { contactSchema, type ContactInput } from '@/lib/validations';
 import { SERVICES, ALL_SERVICE_AREAS } from '@/lib/constants';
 
-export function ContactForm() {
+type ContactFormProps = {
+  defaultCity?: string;
+  source?: string;
+};
+
+export function ContactForm({
+  defaultCity,
+  source = 'contact_form',
+}: ContactFormProps = {}) {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const {
@@ -17,7 +25,10 @@ export function ContactForm() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ContactInput>({ resolver: zodResolver(contactSchema) });
+  } = useForm<ContactInput>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: defaultCity ? { city: defaultCity } : undefined,
+  });
 
   async function onSubmit(values: ContactInput) {
     setStatus('submitting');
@@ -25,7 +36,11 @@ export function ContactForm() {
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...values, source: 'contact_form' }),
+        body: JSON.stringify({
+          ...values,
+          city: values.city || defaultCity || null,
+          source,
+        }),
       });
       if (!res.ok) throw new Error('Submission failed');
       setStatus('success');
@@ -83,6 +98,9 @@ export function ContactForm() {
           <Label htmlFor="c-city">City</Label>
           <Select id="c-city" {...register('city')}>
             <option value="">Choose your city</option>
+            {defaultCity && !ALL_SERVICE_AREAS.includes(defaultCity) && (
+              <option value={defaultCity}>{defaultCity}, NJ</option>
+            )}
             {ALL_SERVICE_AREAS.map((c) => (
               <option key={c} value={c}>
                 {c}, NJ
