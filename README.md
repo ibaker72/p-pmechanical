@@ -51,27 +51,31 @@ The site degrades gracefully — if Supabase, Resend, or Upstash env vars are mi
 
 ## Database setup (Supabase)
 
-Run this SQL in your Supabase SQL editor:
+The canonical schema lives in [`supabase/migrations/`](./supabase/migrations). The latest migration adds the `leads` table, a `status` check constraint, an auto-updating `updated_at` trigger, indexes for the queries the app actually runs (created_at desc, status, source, lower(email), phone), and enables RLS (server uses the service-role key and bypasses it).
 
-```sql
-create table if not exists leads (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz default now(),
-  name text,
-  email text,
-  phone text,
-  service_type text,
-  home_size text,
-  system_age text,
-  message text,
-  source text,
-  preferred_contact_time text,
-  city text,
-  status text default 'new',
-  notes text
-);
+**Apply to a remote Supabase project** (recommended):
 
-create index leads_created_at_idx on leads (created_at desc);
+```bash
+npx supabase login
+npx supabase link --project-ref <your-project-ref>
+npx supabase db push
+```
+
+**Apply to a local stack** (for development):
+
+```bash
+npx supabase start          # spins up Postgres + Studio at :54323
+npx supabase db reset       # applies every migration from scratch
+```
+
+**Or paste manually** — open the SQL editor in the Supabase dashboard and run the contents of the latest file in `supabase/migrations/`.
+
+To add a new migration:
+
+```bash
+npx supabase migration new <name>
+# edit the generated file in supabase/migrations/
+npx supabase db push
 ```
 
 ---

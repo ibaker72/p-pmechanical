@@ -28,19 +28,6 @@ export type LeadRecord = {
   notes?: string | null;
 };
 
-export const LEADS_SCHEMA_SQL = `create table if not exists leads (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz default now(),
-  name text,
-  email text,
-  phone text,
-  service_type text,
-  home_size text,
-  system_age text,
-  message text,
-  source text,
-  preferred_contact_time text,
-  city text,
-  status text default 'new',
-  notes text
-);`;
+export const LEADS_SCHEMA_SQL = `-- Canonical schema lives in supabase/migrations/.
+-- Apply with: supabase db push   (or paste the migration file into the SQL editor.)
+-- This constant is kept for backward compatibility with older docs only.`;
