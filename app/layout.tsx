@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { Barlow_Condensed, DM_Sans } from 'next/font/google';
 import { BUSINESS } from '@/lib/constants';
+import { HvacBusinessSchema } from '@/components/seo/HvacBusinessSchema';
+import { StickyMobileCTA } from '@/components/StickyMobileCTA';
 import './globals.css';
 
 const display = Barlow_Condensed({
@@ -65,9 +67,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`}>
-      <body>
+      <head>
+        <HvacBusinessSchema />
+      </head>
+      <body className="pb-[72px] md:pb-0">
         <a href="#main" className="skip-link">Skip to content</a>
         {children}
+        <StickyMobileCTA />
       </body>
     </html>
   );
