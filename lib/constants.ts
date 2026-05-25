@@ -8,16 +8,16 @@ export const BUSINESS = {
   phoneHref: 'tel:+12014565151',
   // TODO: Replace with real email
   email: 'service@ppmechanicalhvac.com',
-  // TODO: Replace with real address
+  // Home-based business — no public street address by design.
   address: {
-    street: '123 Main Street',
     city: 'Clifton',
     region: 'NJ',
     postalCode: '07011',
     country: 'US',
   },
-  // TODO: Replace with real NJ HVACR license number
-  license: 'NJ HVACR Lic. #19HC00000000',
+  serviceArea: 'Serving all of Passaic & Essex Counties',
+  // TODO: Add real NJ HVACR license number when available.
+  license: 'Licensed & Insured in NJ',
   founded: 2021,
   url: 'https://ppmechanicalllc.com',
   hours: 'Mo-Su 00:00-24:00',

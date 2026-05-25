@@ -28,7 +28,7 @@ export function GET() {
 - Name: ${BUSINESS.name}
 - Legal name: ${BUSINESS.legalName}
 - Founded: ${BUSINESS.founded}
-- Headquarters: ${BUSINESS.address.street}, ${BUSINESS.address.city}, ${BUSINESS.address.region} ${BUSINESS.address.postalCode}
+- Service area: ${BUSINESS.address.city}, ${BUSINESS.address.region} ${BUSINESS.address.postalCode} — ${BUSINESS.serviceArea}
 - Phone: ${BUSINESS.phone}
 - Email: ${BUSINESS.email}
 - License: ${BUSINESS.license}

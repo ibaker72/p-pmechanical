@@ -15,7 +15,12 @@ export default function ContactPage() {
   return (
     <>
       <LocalBusinessSchema />
-      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'Contact', href: '/contact' }]} />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Contact', href: '/contact' },
+        ]}
+      />
 
       <section className="border-b border-white/10 py-20 sm:py-28">
         <div className="container-wide">
@@ -24,8 +29,8 @@ export default function ContactPage() {
             Talk to us. A real person will pick up.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-steel-200">
-            Use the form for non-urgent quotes and questions. For HVAC emergencies — no heat, no AC, a gas smell,
-            a CO alarm — call us directly. We dispatch 24/7.
+            Use the form for non-urgent quotes and questions. For HVAC emergencies — no heat, no AC,
+            a gas smell, a CO alarm — call us directly. We dispatch 24/7.
           </p>
         </div>
       </section>
@@ -55,15 +60,15 @@ export default function ContactPage() {
             />
             <ContactCard
               icon={<MapPin className="h-5 w-5 text-ember-400" />}
-              title="Address"
+              title="Service Area"
               body={
                 <>
-                  {BUSINESS.address.street}
-                  <br />
                   {BUSINESS.address.city}, {BUSINESS.address.region} {BUSINESS.address.postalCode}
+                  <br />
+                  {BUSINESS.serviceArea}
                 </>
               }
-              note="Dispatch + office"
+              note="Clifton-based dispatch"
             />
             <ContactCard
               icon={<Clock className="h-5 w-5 text-ember-400" />}
@@ -83,8 +88,16 @@ export default function ContactPage() {
 }
 
 function ContactCard({
-  icon, title, body, note,
-}: { icon: React.ReactNode; title: string; body: React.ReactNode; note: string }) {
+  icon,
+  title,
+  body,
+  note,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: React.ReactNode;
+  note: string;
+}) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
       <div className="flex items-center gap-3">

@@ -50,13 +50,11 @@ export const metadata: Metadata = {
     description:
       'Premier HVAC, boiler, and AC specialists serving Clifton and North Jersey. 24/7 emergency service, free estimates, licensed & insured.',
     siteName: BUSINESS.name,
-    images: ['/og-default.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: `${BUSINESS.name} | HVAC & Boiler Specialists`,
     description: '24/7 emergency HVAC, boiler, and AC service across North Jersey.',
-    images: ['/og-default.png'],
   },
   // Opens up rich-snippet eligibility in both Google SERPs and AI answer
   // surfaces (ChatGPT/Perplexity quote longer excerpts when allowed).

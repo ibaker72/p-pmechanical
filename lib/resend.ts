@@ -64,7 +64,7 @@ export async function sendCustomerConfirmation(lead: LeadEmailPayload) {
       <p>A member of the ${BUSINESS.name} team will reach out within <strong>2 hours</strong> during business hours (or first thing in the morning if you submitted overnight).</p>
       <p>If your situation is an HVAC emergency — no heat, no AC, a gas smell, or a CO alarm — please call us right now at <a href="${BUSINESS.phoneHref}">${BUSINESS.phone}</a>. We dispatch 24/7.</p>
       <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
-      <p style="font-size:13px;color:#555;">${BUSINESS.name}<br/>${BUSINESS.address.street}, ${BUSINESS.address.city}, ${BUSINESS.address.region} ${BUSINESS.address.postalCode}<br/>${BUSINESS.license}</p>
+      <p style="font-size:13px;color:#555;">${BUSINESS.name}<br/>${BUSINESS.address.city}, ${BUSINESS.address.region} ${BUSINESS.address.postalCode} — ${BUSINESS.serviceArea}<br/>${BUSINESS.license}</p>
     </div>`,
   });
 }

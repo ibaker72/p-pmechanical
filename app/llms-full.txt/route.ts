@@ -32,7 +32,7 @@ ${BUSINESS.name} is an NJ-licensed HVAC, boiler, and AC contractor founded in ${
 
 - Phone: ${BUSINESS.phone}
 - Email: ${BUSINESS.email}
-- Address: ${BUSINESS.address.street}, ${BUSINESS.address.city}, ${BUSINESS.address.region} ${BUSINESS.address.postalCode}
+- Service area: ${BUSINESS.address.city}, ${BUSINESS.address.region} ${BUSINESS.address.postalCode} — ${BUSINESS.serviceArea}
 - License: ${BUSINESS.license}
 - Website: ${SITE_URL}
 

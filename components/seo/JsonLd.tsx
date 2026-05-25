@@ -18,11 +18,10 @@ export function LocalBusinessSchema({ city }: { city?: string }) {
         url: SITE_URL,
         telephone: BUSINESS.phone,
         email: BUSINESS.email,
-        image: `${SITE_URL}/og-default.png`,
+        image: `${SITE_URL}/opengraph-image`,
         priceRange: '$$',
         address: {
           '@type': 'PostalAddress',
-          streetAddress: BUSINESS.address.street,
           addressLocality: city || BUSINESS.address.city,
           addressRegion: BUSINESS.address.region,
           postalCode: BUSINESS.address.postalCode,

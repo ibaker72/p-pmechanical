@@ -1,5 +1,4 @@
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalhvac.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalhvac.com';
 
 const HVAC_BUSINESS_SCHEMA = {
   '@context': 'https://schema.org',
@@ -9,7 +8,7 @@ const HVAC_BUSINESS_SCHEMA = {
   url: SITE_URL,
   telephone: '+12014565151',
   email: 'sales@ppmechanicalhvac.com',
-  image: `${SITE_URL}/og-default.png`,
+  image: `${SITE_URL}/opengraph-image`,
   logo: `${SITE_URL}/logo.png`,
   priceRange: '$$',
   address: {
@@ -41,15 +40,7 @@ const HVAC_BUSINESS_SCHEMA = {
   openingHoursSpecification: [
     {
       '@type': 'OpeningHoursSpecification',
-      dayOfWeek: [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday',
-      ],
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       opens: '00:00',
       closes: '23:59',
     },

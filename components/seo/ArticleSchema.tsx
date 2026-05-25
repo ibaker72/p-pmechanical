@@ -35,7 +35,7 @@ export function ArticleSchema({
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     headline: title,
     description,
-    image: image || `${SITE_URL}/og-default.png`,
+    image: image || `${SITE_URL}/opengraph-image`,
     datePublished,
     dateModified: dateModified || datePublished,
     inLanguage: 'en-US',

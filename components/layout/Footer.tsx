@@ -156,11 +156,11 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-ember-400" />
-                <span>
-                  {BUSINESS.address.street}
-                  <br />
+                <address className="not-italic">
                   {BUSINESS.address.city}, {BUSINESS.address.region} {BUSINESS.address.postalCode}
-                </span>
+                  <br />
+                  {BUSINESS.serviceArea}
+                </address>
               </li>
             </ul>
             <div className="mt-5 rounded-lg border border-ember-500/40 bg-ember-500/10 p-3 text-xs text-ember-100">
