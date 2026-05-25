@@ -1,5 +1,6 @@
 import { Hero } from '@/components/home/Hero';
 import { StatsBar } from '@/components/home/StatsBar';
+import { TrustBadges } from '@/components/home/TrustBadges';
 import { ServicesGrid } from '@/components/home/ServicesGrid';
 import { WhyChooseUs } from '@/components/home/WhyChooseUs';
 import { LeadMagnetSection } from '@/components/home/LeadMagnetSection';
@@ -17,6 +18,7 @@ export default function HomePage() {
       <ReviewSchema />
       <Hero />
       <StatsBar />
+      <TrustBadges />
       <ServicesGrid />
       <WhyChooseUs />
       <LeadMagnetSection />

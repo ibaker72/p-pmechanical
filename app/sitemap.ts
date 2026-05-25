@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/commercial',
     '/locations',
     '/about',
+    '/projects',
     '/contact',
     '/quote',
     '/free-hvac-guide',

@@ -24,6 +24,7 @@ import {
   AccordionContent,
 } from '@/components/ui/accordion';
 import { InlineLeadForm } from '@/components/forms/InlineLeadForm';
+import { TrustBadges } from '@/components/home/TrustBadges';
 import {
   ServiceSchema,
   FaqSchema,
@@ -234,6 +235,8 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
           </div>
         </div>
       </section>
+
+      <TrustBadges />
 
       {/* Local + Related */}
       <section className="py-20 sm:py-24">

@@ -1466,3 +1466,46 @@ export const GENERAL_FAQS: { q: string; a: string; category: string }[] = [
     a: 'A full 21-point inspection: combustion test, refrigerant pressure and temperature, electrical tightening, capacitor and contactor test, blower amp draw, drain line clearing, condensate pan flush, thermostat calibration, and a written health report.',
   },
 ];
+
+// Team members — rendered by the About page team section.
+// TODO: add real names, titles, bios, certifications, and photos. Drop photos in
+// public/images/team/ and set imageSrc (e.g. '/images/team/pete.jpg'). The section
+// stays hidden until at least one member is added.
+export type TeamMember = {
+  name: string;
+  title: string;
+  bio: string;
+  imageSrc?: string;
+  certifications?: string[];
+};
+
+export const TEAM: TeamMember[] = [];
+
+// Equipment brands installed and certifications held — rendered by the
+// TrustBadges component on the homepage and service pages.
+// TODO: add real logo files to public/images/brands/ and public/images/certs/.
+// Each badge row stays hidden until at least one entry is added.
+export type Brand = {
+  name: string;
+  logo: string;
+};
+
+export const BRANDS: Brand[] = [];
+
+export const CERTIFICATIONS: Brand[] = [];
+
+// Completed projects — rendered by the /projects gallery.
+// TODO: add real before/after job photos to public/images/projects/.
+export type Project = {
+  id: string;
+  title: string;
+  location: string;
+  year: number;
+  service: string;
+  description: string;
+  beforeImage?: string;
+  afterImage: string;
+  tags: string[];
+};
+
+export const PROJECTS: Project[] = [];

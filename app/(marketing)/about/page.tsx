@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Award, Users, Wrench, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { BUSINESS } from '@/lib/constants';
+import { BUSINESS, TEAM } from '@/lib/constants';
 import { BreadcrumbSchema, LocalBusinessSchema } from '@/components/seo/JsonLd';
 
 export const metadata: Metadata = {
@@ -14,17 +14,34 @@ export const metadata: Metadata = {
 };
 
 const VALUES = [
-  { icon: Wrench, title: 'Craftsmanship', body: 'Every install is one we would sign our name on the back of.' },
-  { icon: Heart, title: 'Honesty', body: 'Upfront flat-rate pricing. Real diagnoses. No commission-pressured sales.' },
+  {
+    icon: Wrench,
+    title: 'Craftsmanship',
+    body: 'Every install is one we would sign our name on the back of.',
+  },
+  {
+    icon: Heart,
+    title: 'Honesty',
+    body: 'Upfront flat-rate pricing. Real diagnoses. No commission-pressured sales.',
+  },
   { icon: Users, title: 'Service', body: 'A real person on the phone, every hour of every day.' },
-  { icon: Award, title: 'Standards', body: 'EPA, NJ-licensed, and factory-trained on every major brand we install.' },
+  {
+    icon: Award,
+    title: 'Standards',
+    body: 'EPA, NJ-licensed, and factory-trained on every major brand we install.',
+  },
 ];
 
 export default function AboutPage() {
   return (
     <>
       <LocalBusinessSchema />
-      <BreadcrumbSchema items={[{ name: 'Home', href: '/' }, { name: 'About', href: '/about' }]} />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'About', href: '/about' },
+        ]}
+      />
 
       <section className="border-b border-white/10 py-20 sm:py-28">
         <div className="container-wide">
@@ -33,10 +50,11 @@ export default function AboutPage() {
             We started P&amp;P Mechanical because NJ deserved better HVAC.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-steel-200">
-            We grew up in Clifton, learned the trade in basements across Passaic County, and got tired of watching
-            homeowners get talked into the wrong equipment by big-box installers running commission quotas.
-            So in 2021, we built our own shop — small enough to know every customer&apos;s name, serious enough
-            to compete on craftsmanship with anyone in the state.
+            We grew up in Clifton, learned the trade in basements across Passaic County, and got
+            tired of watching homeowners get talked into the wrong equipment by big-box installers
+            running commission quotas. So in 2021, we built our own shop — small enough to know
+            every customer&apos;s name, serious enough to compete on craftsmanship with anyone in
+            the state.
           </p>
         </div>
       </section>
@@ -58,18 +76,20 @@ export default function AboutPage() {
             <h2 className="heading-section text-balance">A small shop with a big standard.</h2>
             <div className="prose-pp mt-5">
               <p>
-                We opened the doors in 2021 with two trucks, a phone, and a promise: every system we touch leaves
-                the home cleaner and quieter than we found it. We do not chase volume. We do not employ
-                commissioned salespeople. We do not say yes to work we cannot do exceptionally well.
+                We opened the doors in 2021 with two trucks, a phone, and a promise: every system we
+                touch leaves the home cleaner and quieter than we found it. We do not chase volume.
+                We do not employ commissioned salespeople. We do not say yes to work we cannot do
+                exceptionally well.
               </p>
               <p>
-                What we do — and what we are good at — is HVAC done the right way. Manual J load calculations.
-                Sealed-combustion venting. Refrigerant charged by weight. Clean, code-compliant near-boiler piping.
-                The kind of work that lasts twenty years instead of twelve.
+                What we do — and what we are good at — is HVAC done the right way. Manual J load
+                calculations. Sealed-combustion venting. Refrigerant charged by weight. Clean,
+                code-compliant near-boiler piping. The kind of work that lasts twenty years instead
+                of twelve.
               </p>
               <p>
-                If you want HVAC done by people who treat your home the way they treat their own, you are in the
-                right place.
+                If you want HVAC done by people who treat your home the way they treat their own,
+                you are in the right place.
               </p>
             </div>
           </div>
@@ -95,6 +115,54 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {TEAM.length > 0 && (
+        <section className="border-t border-white/10 py-20 sm:py-24">
+          <div className="container-wide">
+            <span className="eyebrow mb-4">Our Team</span>
+            <h2 className="heading-section text-balance">The people behind the work.</h2>
+            <div className="mt-12 grid gap-10 md:grid-cols-2">
+              {TEAM.map((member) => (
+                <div key={member.name} className="flex items-start gap-6">
+                  {member.imageSrc ? (
+                    <Image
+                      src={member.imageSrc}
+                      alt={`${member.name}, ${member.title}`}
+                      width={80}
+                      height={80}
+                      className="h-20 w-20 shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white/5 font-display text-lg text-steel-100 ring-1 ring-white/10">
+                      {member.name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')}
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-display text-xl text-white">{member.name}</p>
+                    <p className="text-sm text-ember-300">{member.title}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-steel-200">{member.bio}</p>
+                    {member.certifications && member.certifications.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {member.certifications.map((cert) => (
+                          <span
+                            key={cert}
+                            className="rounded border border-white/10 px-2 py-0.5 text-xs text-steel-300"
+                          >
+                            {cert}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="py-20 sm:py-24">
         <div className="container-tight text-center">
