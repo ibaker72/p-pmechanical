@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Menu, Phone, X, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BUSINESS } from '@/lib/constants';
@@ -20,12 +20,16 @@ const NAV = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const el = sentinelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => setScrolled(!entry.isIntersecting), {
+      threshold: 0,
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   useEffect(() => {
@@ -38,7 +42,7 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        'fixed inset-x-0 top-0 z-50 transition-all duration-300',
+        'fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-300',
         scrolled ? 'border-b border-white/10 bg-ink-950/80 backdrop-blur-xl' : 'bg-transparent',
       )}
     >
@@ -92,10 +96,13 @@ export function Navbar() {
         </button>
       </div>
 
+      {/* Scroll sentinel — triggers scrolled state without a scroll listener */}
+      <div ref={sentinelRef} className="fixed top-24 left-0 w-px h-px pointer-events-none" aria-hidden />
+
       {/* Mobile menu */}
       <div
         className={cn(
-          'bg-ink-950/98 fixed inset-0 z-[60] flex flex-col backdrop-blur-xl transition-opacity lg:hidden',
+          'bg-ink-950 fixed inset-0 z-[60] flex flex-col transition-opacity lg:hidden',
           open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
         )}
       >

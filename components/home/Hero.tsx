@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Phone, ShieldCheck, Clock, FileText, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BUSINESS } from '@/lib/constants';
@@ -31,18 +30,14 @@ export function Hero() {
               left: `${(i * 73) % 100}%`,
               top: `${(i * 41) % 100}%`,
               animation: `float ${6 + (i % 5)}s ease-in-out ${i * 0.3}s infinite`,
+              willChange: 'transform',
             }}
           />
         ))}
       </div>
 
       <div className="container-wide relative pb-24 pt-20 lg:pb-32 lg:pt-28">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="max-w-3xl"
-        >
+        <div className="max-w-3xl animate-fade-up">
           <span className="eyebrow mb-6">Clifton · Passaic · Paterson · North Jersey</span>
           <h1 className="heading-display text-shadow-hero text-balance">
             North Jersey&apos;s
@@ -78,7 +73,7 @@ export function Hero() {
               </li>
             ))}
           </ul>
-        </motion.div>
+        </div>
       </div>
 
       {/* Bottom fade into next section */}
