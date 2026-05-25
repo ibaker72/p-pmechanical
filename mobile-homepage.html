@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0D1117" />
+<title>P&amp;P Mechanical LLC — North Jersey's Premier HVAC &amp; Boiler Specialists</title>
+<meta name="description" content="Residential & commercial HVAC, boiler, and AC service across Clifton, Passaic, Paterson and North Jersey. Licensed, insured, 24/7 emergency dispatch. Call (201) 456-5151." />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --orange: #F97316;
+    --copper: #B45309;
+    --bg: #0D1117;
+    --surface: #161B22;
+    --surface-2: #1C232E;
+    --text: #F0F6FC;
+    --muted: #8B949E;
+    --border: rgba(180, 83, 9, 0.18);
+
+    --head: 'Barlow Condensed', system-ui, sans-serif;
+    --body: 'DM Sans', system-ui, sans-serif;
+
+    --header-h: 60px;
+    --bottombar-h: 64px;
+
+    --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text);
+    background: var(--bg);
+    overflow-x: hidden;
+    padding-bottom: var(--bottombar-h);
+    padding-bottom: calc(var(--bottombar-h) + env(safe-area-inset-bottom));
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  ul { list-style: none; }
+
+  .wrap { padding-left: 20px; padding-right: 20px; }
+
+  /* Hide scrollbars on horizontal scrollers */
+  .hscroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 4px;
+  }
+  .hscroll::-webkit-scrollbar { display: none; }
+  .hscroll > * { scroll-snap-align: start; flex: 0 0 auto; }
+
+  /* ============ HEADER ============ */
+  .header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    background: rgba(13, 17, 23, 0.72);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid transparent;
+    transition: border-color .35s ease, background .35s ease;
+  }
+  .header.scrolled {
+    border-bottom-color: var(--copper);
+    background: rgba(13, 17, 23, 0.92);
+  }
+
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .flame {
+    width: 30px; height: 30px;
+    flex: 0 0 auto;
+    display: grid; place-items: center;
+    filter: drop-shadow(0 0 6px rgba(249, 115, 22, .55));
+  }
+  .brand-text { display: flex; flex-direction: column; line-height: 1; }
+  .brand-name {
+    font-family: var(--head);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: .5px;
+    color: var(--text);
+  }
+  .brand-sub {
+    font-family: var(--head);
+    font-weight: 600;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--orange);
+    margin-top: 2px;
+  }
+
+  .hamburger {
+    width: 44px; height: 44px;
+    display: grid; place-items: center;
+    border-radius: 8px;
+    border: 1px solid rgba(240, 246, 252, .12);
+  }
+  .hamburger span {
+    display: block;
+    width: 20px; height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    position: relative;
+  }
+  .hamburger span::before,
+  .hamburger span::after {
+    content: ''; position: absolute; left: 0;
+    width: 20px; height: 2px; background: var(--text); border-radius: 2px;
+  }
+  .hamburger span::before { top: -6px; }
+  .hamburger span::after  { top: 6px; }
+
+  /* ============ NAV DRAWER ============ */
+  .scrim {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.6);
+    backdrop-filter: blur(2px);
+    opacity: 0; visibility: hidden;
+    transition: opacity .3s ease, visibility .3s ease;
+    z-index: 200;
+  }
+  .scrim.open { opacity: 1; visibility: visible; }
+
+  .drawer {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 80vw; max-width: 360px;
+    background: var(--surface);
+    z-index: 210;
+    transform: translateX(100%);
+    transition: transform .38s cubic-bezier(.4, 0, .2, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -20px 0 50px rgba(0,0,0,.5);
+    overflow-y: auto;
+  }
+  .drawer::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: var(--noise);
+    background-size: 160px;
+    opacity: .04;
+    pointer-events: none;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .drawer-head .brand-name { font-size: 17px; }
+  .drawer-close {
+    width: 44px; height: 44px;
+    display: grid; place-items: center;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.1);
+    font-size: 22px; line-height: 1; color: var(--text);
+  }
+
+  .drawer nav { padding: 12px 8px; flex: 1; }
+  .drawer nav a {
+    display: flex; align-items: center;
+    min-height: 52px;
+    padding: 0 16px;
+    font-family: var(--head);
+    font-weight: 600;
+    font-size: 21px;
+    letter-spacing: .5px;
+    color: var(--text);
+    border-radius: 10px;
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  .drawer nav a .arrow { margin-left: auto; color: var(--copper); font-size: 16px; }
+  .drawer nav a:active { background: var(--surface-2); }
+  .drawer.open nav a {
+    animation: navIn .4s forwards cubic-bezier(.2,.7,.3,1);
+  }
+  @keyframes navIn { to { opacity: 1; transform: translateX(0); } }
+
+  .drawer-foot { padding: 16px 20px 28px; }
+  .btn-call-drawer {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    height: 54px;
+    background: var(--orange);
+    color: #fff;
+    font-family: var(--head);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: .5px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(249, 115, 22, .35);
+  }
+
+  /* ============ HERO ============ */
+  .hero {
+    position: relative;
+    padding-top: calc(var(--header-h) + 34px);
+    padding-bottom: 40px;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 80% at 50% 0%, #1a2436 0%, #0e1420 45%, #07090e 100%);
+  }
+  .hero::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: var(--noise);
+    background-size: 150px;
+    opacity: .03;
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; z-index: 2; }
+
+  /* glowing dots */
+  .dots { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--orange);
+    box-shadow: 0 0 12px 3px rgba(249,115,22,.6);
+    opacity: .5;
+  }
+  .dot:nth-child(1){ top: 12%; left: 14%; animation: drift1 9s ease-in-out infinite; }
+  .dot:nth-child(2){ top: 28%; left: 82%; width:6px;height:6px; animation: drift2 11s ease-in-out infinite; }
+  .dot:nth-child(3){ top: 52%; left: 8%;  width:5px;height:5px; animation: drift1 13s ease-in-out infinite .5s; }
+  .dot:nth-child(4){ top: 64%; left: 90%; animation: drift2 10s ease-in-out infinite 1s; }
+  .dot:nth-child(5){ top: 40%; left: 46%; width:4px;height:4px; animation: drift1 14s ease-in-out infinite 2s; }
+  .dot:nth-child(6){ top: 80%; left: 30%; width:6px;height:6px; animation: drift2 12s ease-in-out infinite .8s; }
+  .dot:nth-child(7){ top: 18%; left: 60%; width:5px;height:5px; animation: drift1 15s ease-in-out infinite 1.5s; }
+  .dot:nth-child(8){ top: 72%; left: 66%; width:7px;height:7px; animation: drift2 13s ease-in-out infinite .3s; }
+  @keyframes drift1 {
+    0%,100% { transform: translate(0,0) scale(1); opacity:.35; }
+    50%     { transform: translate(10px,-14px) scale(1.4); opacity:.75; }
+  }
+  @keyframes drift2 {
+    0%,100% { transform: translate(0,0) scale(1); opacity:.3; }
+    50%     { transform: translate(-12px,12px) scale(1.5); opacity:.7; }
+  }
+
+  .chips-loc {
+    font-family: var(--head);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    color: var(--copper);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 {
+    font-family: var(--head);
+    line-height: .98;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+  .hero h1 .l1 { display: block; font-weight: 400; font-size: 40px; color: var(--text); }
+  .hero h1 .l2 { display: block; font-weight: 700; font-size: 52px; color: var(--orange); }
+
+  .hero p.lede { color: var(--muted); font-size: 15px; margin-bottom: 26px; max-width: 40ch; }
+
+  .btn-primary {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%;
+    height: 52px;
+    background: var(--orange);
+    color: #fff;
+    font-family: var(--head);
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: .5px;
+    border-radius: 6px;
+    box-shadow: 0 10px 28px rgba(249,115,22,.32);
+    margin-bottom: 12px;
+    transition: transform .12s ease;
+  }
+  .btn-primary:active { transform: scale(.985); }
+
+  .btn-ghost {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 52px;
+    background: transparent;
+    color: var(--text);
+    border: 1.5px solid rgba(240,246,252,.4);
+    font-family: var(--head);
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: .5px;
+    border-radius: 6px;
+    margin-bottom: 22px;
+    transition: border-color .2s ease, transform .12s ease;
+  }
+  .btn-ghost:active { transform: scale(.985); border-color: var(--orange); }
+
+  .trust-row { margin: 0 -20px; padding: 0 20px; }
+  .trust-pill {
+    display: inline-flex; align-items: center;
+    height: 36px;
+    padding: 0 14px;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* hero load animation */
+  .reveal { opacity: 0; transform: translateY(16px); animation: heroIn .6s forwards cubic-bezier(.2,.7,.3,1); }
+  .d1 { animation-delay: .05s; }
+  .d2 { animation-delay: .15s; }
+  .d3 { animation-delay: .25s; }
+  .d4 { animation-delay: .35s; }
+  .d5 { animation-delay: .45s; }
+  @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
+
+  /* ============ STATS ============ */
+  .stats-section { padding: 28px 20px; }
+  .stats-card {
+    background: var(--surface);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.05);
+    border-top: 3px solid var(--orange);
+    padding: 26px 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px 16px;
+  }
+  .stat { text-align: center; }
+  .stat .num {
+    font-family: var(--head);
+    font-weight: 700;
+    font-size: 38px;
+    line-height: 1;
+    color: var(--text);
+  }
+  .stat .label {
+    font-family: var(--head);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-top: 8px;
+  }
+
+  /* ============ SECTION SHELL ============ */
+  section.block { padding: 40px 0; }
+  .seclabel {
+    font-family: var(--head);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 10px;
+  }
+  h2.sectitle {
+    font-family: var(--head);
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.08;
+    letter-spacing: -.5px;
+    color: var(--text);
+    margin-bottom: 22px;
+  }
+  h3.sectitle { font-family: var(--head); font-weight: 700; font-size: 26px; color: var(--text); margin-bottom: 18px; letter-spacing: -.3px; }
+
+  /* ============ SERVICES ============ */
+  .svc-row { padding: 0 20px; }
+  .svc-card {
+    width: 210px;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 14px;
+    padding: 20px 18px;
+    display: flex; flex-direction: column;
+    transition: border-color .2s ease;
+  }
+  .svc-card:active { border-color: var(--orange); }
+  .svc-icon {
+    width: 46px; height: 46px;
+    display: grid; place-items: center;
+    border-radius: 11px;
+    background: rgba(249,115,22,.12);
+    font-size: 24px;
+    margin-bottom: 14px;
+  }
+  .svc-card h4 { font-family: var(--head); font-weight: 600; font-size: 19px; line-height: 1.1; color: var(--text); margin-bottom: 8px; }
+  .svc-card p { font-size: 13px; color: var(--muted); flex: 1; margin-bottom: 14px; }
+  .svc-more { font-family: var(--head); font-weight: 600; font-size: 14px; letter-spacing: .5px; color: var(--copper); }
+
+  /* ============ REVIEWS ============ */
+  .rev-row { padding: 0 20px; }
+  .rev-card {
+    width: 280px;
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 14px;
+    padding: 22px 20px;
+    display: flex; flex-direction: column;
+  }
+  .stars { color: var(--orange); font-size: 16px; letter-spacing: 2px; margin-bottom: 12px; }
+  .rev-card .quote { font-size: 14px; line-height: 1.55; color: var(--text); flex: 1; margin-bottom: 16px; }
+  .rev-meta { font-size: 12px; color: var(--muted); }
+  .rev-meta strong { color: var(--text); font-weight: 500; display: block; }
+  .rev-foot { padding: 18px 20px 0; font-size: 13px; color: var(--muted); }
+
+  /* ============ EMERGENCY ============ */
+  .emergency {
+    background: linear-gradient(135deg, var(--orange) 0%, var(--copper) 130%);
+    padding: 44px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .emergency::before {
+    content:''; position:absolute; inset:0;
+    background-image: var(--noise); background-size:140px; opacity:.06; pointer-events:none;
+  }
+  .emergency h2 {
+    position: relative;
+    font-family: var(--head);
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: -.5px;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .emergency p { position: relative; color: rgba(255,255,255,.92); font-size: 15px; margin-bottom: 24px; }
+  .btn-emergency {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 56px;
+    background: var(--bg);
+    color: #fff;
+    font-family: var(--head);
+    font-weight: 700;
+    font-size: 19px;
+    letter-spacing: .5px;
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  }
+
+  /* ============ FOOTER ============ */
+  footer {
+    background: var(--surface);
+    padding: 40px 20px 36px;
+    border-top: 1px solid rgba(255,255,255,.05);
+  }
+  .foot-brand { margin-bottom: 26px; }
+  .foot-brand .brand { margin-bottom: 12px; }
+  .foot-tag { font-size: 13px; color: var(--muted); max-width: 32ch; }
+  .foot-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .foot-col h5 {
+    font-family: var(--head); font-weight: 600; font-size: 13px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--copper); margin-bottom: 14px;
+  }
+  .foot-col a { display: block; font-size: 14px; color: var(--muted); padding: 7px 0; }
+  .foot-col a:active { color: var(--orange); }
+  .foot-bottom { border-top: 1px solid rgba(255,255,255,.06); padding-top: 22px; }
+  .foot-copy { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .socials { display: flex; gap: 12px; }
+  .socials a {
+    width: 40px; height: 40px;
+    display: grid; place-items: center;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid rgba(255,255,255,.06);
+    color: var(--muted);
+  }
+  .socials a:active { color: var(--orange); border-color: var(--orange); }
+
+  /* ============ STICKY BOTTOM BAR ============ */
+  .bottombar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: var(--bottombar-h);
+    height: calc(var(--bottombar-h) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 150;
+    display: flex;
+    background: var(--surface);
+    box-shadow: 0 -6px 24px rgba(0,0,0,.35);
+  }
+  .bottombar a {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    font-family: var(--head);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: .5px;
+    height: var(--bottombar-h);
+  }
+  .bb-call { background: var(--orange); color: #fff; }
+  .bb-text { background: var(--surface); color: var(--text); }
+  .bottombar .divider { width: 1px; background: rgba(255,255,255,.1); }
+
+  /* ============ SCROLL REVEAL ============ */
+  .fade { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+  .fade.in { opacity: 1; transform: translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001s !important; animation-delay: 0s !important; transition-duration: .001s !important; }
+    .reveal, .fade { opacity: 1 !important; transform: none !important; }
+  }
+
+  @media (min-width: 480px) {
+    .wrap, .stats-section, section.block .seclabel, section.block .sectitle { }
+    .hero h1 .l2 { font-size: 58px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header class="header" id="header">
+  <a class="brand" href="#top" aria-label="P&amp;P Mechanical home">
+    <span class="flame" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2c1.5 3.2.4 5.3-1 7-1.4 1.7-2.5 3-2.5 5.2A5.5 5.5 0 0 0 18 14c0-2-1-3.6-1.6-5.2 2 .8 3.6 2.8 3.6 5.6A8 8 0 1 1 6.2 8.4C8 6.6 11 5.2 12 2Z" fill="#F97316"/>
+        <path d="M12 13c.8 1.3.3 2.4-.6 3.2-.6.6-1 1.1-1 1.9A2 2 0 0 0 14 18c0-1.2-.8-2-.8-2 .9.4 1.6 1.3 1.6 2.4A3 3 0 1 1 9 16.6c.9-.9 2.2-1.6 3-3.6Z" fill="#FDBA74"/>
+      </svg>
+    </span>
+    <span class="brand-text">
+      <span class="brand-name">P&amp;P MECHANICAL</span>
+      <span class="brand-sub">HVAC · BOILER · AC</span>
+    </span>
+  </a>
+  <button class="hamburger" id="openNav" aria-label="Open menu" aria-controls="drawer" aria-expanded="false">
+    <span></span>
+  </button>
+</header>
+
+<!-- ========== NAV DRAWER ========== -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Main menu">
+  <div class="drawer-head">
+    <span class="brand-name">MENU</span>
+    <button class="drawer-close" id="closeNav" aria-label="Close menu">&times;</button>
+  </div>
+  <nav>
+    <a href="#services" style="animation-delay:.05s"><span>Services</span><span class="arrow">→</span></a>
+    <a href="#areas" style="animation-delay:.10s"><span>Service Areas</span><span class="arrow">→</span></a>
+    <a href="#projects" style="animation-delay:.15s"><span>Projects</span><span class="arrow">→</span></a>
+    <a href="#about" style="animation-delay:.20s"><span>About</span><span class="arrow">→</span></a>
+    <a href="#blog" style="animation-delay:.25s"><span>Blog</span><span class="arrow">→</span></a>
+    <a href="#contact" style="animation-delay:.30s"><span>Contact</span><span class="arrow">→</span></a>
+  </nav>
+  <div class="drawer-foot">
+    <a class="btn-call-drawer" href="tel:+12014565151">📞 Call (201) 456-5151</a>
+  </div>
+</aside>
+
+<!-- ========== HERO ========== -->
+<a id="top"></a>
+<section class="hero">
+  <div class="dots" aria-hidden="true">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+  </div>
+  <div class="hero-inner wrap">
+    <p class="chips-loc reveal d1">Clifton · Passaic · Paterson · North Jersey</p>
+    <h1 class="reveal d2">
+      <span class="l1">North Jersey's</span>
+      <span class="l2">Premier HVAC &amp;<br>Boiler Specialists</span>
+    </h1>
+    <p class="lede reveal d3">Residential &amp; commercial — installation, repair, and 24/7 emergency dispatch across Clifton, Passaic County, and surrounding areas. Licensed, insured, and committed to exceptional craftsmanship.</p>
+    <a class="btn-primary reveal d4" href="#contact">GET A FREE QUOTE</a>
+    <a class="btn-ghost reveal d4" href="tel:+12014565151">📞 CALL (201) 456-5151</a>
+    <div class="hscroll trust-row reveal d5">
+      <span class="trust-pill">✓ Licensed &amp; Insured</span>
+      <span class="trust-pill">⚡ Same-Day Service</span>
+      <span class="trust-pill">📋 Free Estimates</span>
+      <span class="trust-pill">💳 Financing Available</span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== STATS ========== -->
+<div class="stats-section">
+  <div class="stats-card fade" id="stats">
+    <div class="stat">
+      <div class="num" data-target="500" data-suffix="+">0</div>
+      <div class="label">Jobs Completed</div>
+    </div>
+    <div class="stat">
+      <div class="num" data-target="4.9" data-decimals="1" data-suffix="★">0</div>
+      <div class="label">Average Rating</div>
+    </div>
+    <div class="stat">
+      <div class="num" data-target="2021" data-plain="1">0</div>
+      <div class="label">Serving NJ Since</div>
+    </div>
+    <div class="stat">
+      <div class="num">24/7</div>
+      <div class="label">Emergency Service</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SERVICES ========== -->
+<section class="block" id="services">
+  <div class="wrap fade">
+    <p class="seclabel">What We Do</p>
+    <h2 class="sectitle">Every HVAC Service North Jersey Homes &amp; Businesses Need</h2>
+  </div>
+  <div class="hscroll svc-row fade">
+    <article class="svc-card">
+      <div class="svc-icon" aria-hidden="true">❄️</div>
+      <h4>HVAC Installation</h4>
+      <p>High-efficiency systems sized and installed right the first time.</p>
+      <a class="svc-more" href="#contact">Learn more →</a>
+    </article>
+    <article class="svc-card">
+      <div class="svc-icon" aria-hidden="true">🔥</div>
+      <h4>Boiler Repair &amp; Replacement</h4>
+      <p>Fast diagnostics and reliable boiler service for any brand.</p>
+      <a class="svc-more" href="#contact">Learn more →</a>
+    </article>
+    <article class="svc-card">
+      <div class="svc-icon" aria-hidden="true">🧊</div>
+      <h4>AC Installation &amp; Service</h4>
+      <p>Stay cool all summer with expert AC installs and tune-ups.</p>
+      <a class="svc-more" href="#contact">Learn more →</a>
+    </article>
+    <article class="svc-card">
+      <div class="svc-icon" aria-hidden="true">🚨</div>
+      <h4>24/7 Emergency</h4>
+      <p>Technicians dispatched day or night when you need us most.</p>
+      <a class="svc-more" href="#contact">Learn more →</a>
+    </article>
+    <article class="svc-card">
+      <div class="svc-icon" aria-hidden="true">🏢</div>
+      <h4>Commercial HVAC</h4>
+      <p>Rooftop units, RTUs, and maintenance contracts for businesses.</p>
+      <a class="svc-more" href="#contact">Learn more →</a>
+    </article>
+    <article class="svc-card">
+      <div class="svc-icon" aria-hidden="true">🛠️</div>
+      <h4>Heating System Tune-Up</h4>
+      <p>Seasonal tune-ups that cut bills and prevent breakdowns.</p>
+      <a class="svc-more" href="#contact">Learn more →</a>
+    </article>
+  </div>
+</section>
+
+<!-- ========== SOCIAL PROOF ========== -->
+<section class="block" id="reviews">
+  <div class="wrap fade">
+    <h3 class="sectitle">What Our Customers Say</h3>
+  </div>
+  <div class="hscroll rev-row fade">
+    <article class="rev-card">
+      <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+      <p class="quote">"Our boiler died on the coldest night of the year. P&amp;P had a tech at our door within the hour and heat back on before midnight. Lifesavers."</p>
+      <div class="rev-meta"><strong>Maria D.</strong>Clifton, NJ</div>
+    </article>
+    <article class="rev-card">
+      <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+      <p class="quote">"Replaced our whole AC system in a single day. Clean, professional, and the price beat every other quote we got in Passaic County."</p>
+      <div class="rev-meta"><strong>James R.</strong>Passaic, NJ</div>
+    </article>
+    <article class="rev-card">
+      <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+      <p class="quote">"Honest, on-time, and they explained everything in plain English. Finally an HVAC company in Paterson I actually trust."</p>
+      <div class="rev-meta"><strong>Anthony P.</strong>Paterson, NJ</div>
+    </article>
+  </div>
+  <p class="rev-foot wrap fade">500+ 5-star reviews across Google &amp; HomeAdvisor</p>
+</section>
+
+<!-- ========== EMERGENCY CTA ========== -->
+<section class="emergency" id="emergency">
+  <h2 class="fade">HVAC Emergency?</h2>
+  <p class="fade">We dispatch technicians 24/7 across North Jersey</p>
+  <a class="btn-emergency fade" href="tel:+12014565151">📞 CALL NOW: (201) 456-5151</a>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer id="contact">
+  <div class="foot-brand">
+    <a class="brand" href="#top" aria-label="P&amp;P Mechanical home">
+      <span class="flame" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2c1.5 3.2.4 5.3-1 7-1.4 1.7-2.5 3-2.5 5.2A5.5 5.5 0 0 0 18 14c0-2-1-3.6-1.6-5.2 2 .8 3.6 2.8 3.6 5.6A8 8 0 1 1 6.2 8.4C8 6.6 11 5.2 12 2Z" fill="#F97316"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">P&amp;P MECHANICAL</span>
+        <span class="brand-sub">HVAC · BOILER · AC</span>
+      </span>
+    </a>
+    <p class="foot-tag">North Jersey's premier HVAC &amp; boiler specialists. Licensed, insured, and serving our community since 2021.</p>
+  </div>
+  <div class="foot-cols">
+    <div class="foot-col">
+      <h5>Services</h5>
+      <a href="#services">HVAC Installation</a>
+      <a href="#services">Boiler Repair</a>
+      <a href="#services">AC Service</a>
+      <a href="#services">Emergency Dispatch</a>
+      <a href="#services">Commercial HVAC</a>
+    </div>
+    <div class="foot-col">
+      <h5>Company</h5>
+      <a href="#about">About Us</a>
+      <a href="#areas">Service Areas</a>
+      <a href="#projects">Projects</a>
+      <a href="#blog">Blog</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <p class="foot-copy">© 2025 P&amp;P Mechanical LLC · Licensed &amp; Insured in NJ</p>
+    <div class="socials">
+      <a href="#" aria-label="Facebook">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 22v-8h2.6l.4-3H13V9c0-.9.3-1.5 1.6-1.5H16V4.8c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1V11H7v3h2.6v8H13z"/></svg>
+      </a>
+      <a href="#" aria-label="Instagram">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" aria-label="Google Business">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 11v2.8h4c-.2 1-1.4 3-4 3a4.8 4.8 0 1 1 0-9.6c1.4 0 2.3.6 2.8 1.1l1.9-1.9A7.6 7.6 0 0 0 12 4a8 8 0 1 0 0 16c4.6 0 7.6-3.2 7.6-7.8 0-.5 0-.9-.1-1.2H12z"/></svg>
+      </a>
+      <a href="tel:+12014565151" aria-label="Call us">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.3 1l-2.1 2.2z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ========== STICKY BOTTOM BAR ========== -->
+<nav class="bottombar" aria-label="Quick contact">
+  <a class="bb-call" href="tel:+12014565151" aria-label="Call us 24/7">📞 Call 24/7</a>
+  <span class="divider" aria-hidden="true"></span>
+  <a class="bb-text" href="sms:+12014565151" aria-label="Text us">💬 Text Us</a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---- Header scroll border ---- */
+  var header = document.getElementById('header');
+  function onScroll() {
+    if (window.scrollY > 80) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ---- Nav drawer ---- */
+  var drawer = document.getElementById('drawer');
+  var scrim = document.getElementById('scrim');
+  var openBtn = document.getElementById('openNav');
+  var closeBtn = document.getElementById('closeNav');
+
+  function openNav() {
+    drawer.classList.add('open');
+    scrim.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
+    openBtn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeNav() {
+    drawer.classList.remove('open');
+    scrim.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+    openBtn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+  openBtn.addEventListener('click', openNav);
+  closeBtn.addEventListener('click', closeNav);
+  scrim.addEventListener('click', closeNav);
+  drawer.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', closeNav); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeNav(); });
+
+  /* ---- Counter animation ---- */
+  function animateCount(el) {
+    var target = parseFloat(el.getAttribute('data-target'));
+    var decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+    var suffix = el.getAttribute('data-suffix') || '';
+    var plain = el.getAttribute('data-plain') === '1';
+    var dur = 1300, start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var val = target * eased;
+      if (plain) {
+        el.textContent = Math.round(val).toString();
+      } else {
+        el.textContent = val.toFixed(decimals) + suffix;
+      }
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = (plain ? Math.round(target).toString() : target.toFixed(decimals) + suffix);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ---- IntersectionObserver fade-ins + counters ---- */
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var el = entry.target;
+      el.classList.add('in');
+      if (el.id === 'stats') {
+        el.querySelectorAll('.num[data-target]').forEach(animateCount);
+      }
+      io.unobserve(el);
+    });
+  }, { threshold: 0.2, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade').forEach(function (el) { io.observe(el); });
+})();
+</script>
+</body>
+</html>
