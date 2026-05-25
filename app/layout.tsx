@@ -87,6 +87,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <HvacBusinessSchema />
         <OrganizationSchema />
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
         <link
           rel="alternate"
           type="text/plain"

@@ -7,7 +7,6 @@
     color-scheme: dark;
   }
   html {
-    scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
   }
   body {
@@ -15,7 +14,7 @@
     background-image:
       radial-gradient(1200px 600px at 80% -10%, rgba(249, 115, 22, 0.08), transparent),
       radial-gradient(800px 400px at -10% 30%, rgba(31, 41, 55, 0.6), transparent);
-    background-attachment: fixed;
+    background-attachment: scroll;
   }
   ::selection {
     @apply bg-ember-500/40 text-white;
@@ -61,7 +60,15 @@
   }
 }
 
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.7s ease-out both;
+  }
   .text-shadow-hero {
     text-shadow: 0 4px 30px rgba(0, 0, 0, 0.55);
   }
