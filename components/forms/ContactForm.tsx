@@ -81,7 +81,7 @@ export function ContactForm({ defaultCity, source = 'contact_form' }: ContactFor
         </div>
         <div>
           <Label htmlFor="c-phone">Phone</Label>
-          <Input id="c-phone" type="tel" placeholder="(973) 555-0123" {...register('phone')} />
+          <Input id="c-phone" type="tel" placeholder="(201) 456-5151" {...register('phone')} />
           <FieldError>{errors.phone?.message}</FieldError>
         </div>
       </div>

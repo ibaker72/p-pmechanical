@@ -255,7 +255,7 @@ export function QuoteWizard() {
                     <Input
                       id="qw-phone"
                       type="tel"
-                      placeholder="(973) 555-0123"
+                      placeholder="(201) 456-5151"
                       value={data.phone || ''}
                       onChange={(e) => setData((d) => ({ ...d, phone: e.target.value }))}
                     />

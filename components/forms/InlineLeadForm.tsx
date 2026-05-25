@@ -75,7 +75,7 @@ export function InlineLeadForm({
       </div>
       <div>
         <Label htmlFor="il-phone">Phone</Label>
-        <Input id="il-phone" type="tel" placeholder="(973) 555-0123" {...register('phone')} />
+        <Input id="il-phone" type="tel" placeholder="(201) 456-5151" {...register('phone')} />
         <FieldError>{errors.phone?.message}</FieldError>
       </div>
       <div>

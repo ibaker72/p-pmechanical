@@ -4,8 +4,8 @@ export const BUSINESS = {
   name: 'P&P Mechanical LLC',
   legalName: 'P&P Mechanical LLC',
   // TODO: Replace with real phone number
-  phone: '(973) 555-0123',
-  phoneHref: 'tel:+19735550123',
+  phone: '(201) 456-5151',
+  phoneHref: 'tel:+12014565151',
   // TODO: Replace with real email
   email: 'service@ppmechanicalhvac.com',
   // TODO: Replace with real address
@@ -19,7 +19,7 @@ export const BUSINESS = {
   // TODO: Replace with real NJ HVACR license number
   license: 'NJ HVACR Lic. #19HC00000000',
   founded: 2021,
-  url: 'https://ppmechanicalhvac.com',
+  url: 'https://ppmechanicalllc.com',
   hours: 'Mo-Su 00:00-24:00',
   social: {
     // TODO: Replace with real social URLs
