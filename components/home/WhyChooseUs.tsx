@@ -1,8 +1,6 @@
-'use client';
-
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { Zap, Tag, Award, Leaf } from 'lucide-react';
+import { Reveal } from '@/components/ui/Reveal';
 
 const POINTS = [
   {
@@ -29,7 +27,7 @@ const POINTS = [
 
 export function WhyChooseUs() {
   return (
-    <section className="relative py-24 sm:py-32 bg-ink-900/50">
+    <section className="relative bg-ink-900/50 py-24 sm:py-32">
       <div className="container-wide">
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
           <div>
@@ -38,18 +36,17 @@ export function WhyChooseUs() {
               The standard the rest of NJ should be held to.
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-steel-200">
-              We built P&amp;P Mechanical to do HVAC the way our grandparents would have wanted it done —
-              honest pricing, real craftsmanship, and a phone that gets answered by a human.
+              We built P&amp;P Mechanical to do HVAC the way our grandparents would have wanted it
+              done — honest pricing, real craftsmanship, and a phone that gets answered by a human.
             </p>
 
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
               {POINTS.map((p, i) => (
-                <motion.div
+                <Reveal
                   key={p.title}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.5, delay: i * 0.08 }}
+                  variant="left"
+                  delay={i * 0.08}
+                  amount={0.3}
                   className="flex gap-4"
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-ember-500/10 ring-1 ring-ember-500/30">
@@ -59,16 +56,14 @@ export function WhyChooseUs() {
                     <h3 className="font-display text-xl text-white">{p.title}</h3>
                     <p className="mt-1 text-sm leading-relaxed text-steel-200">{p.body}</p>
                   </div>
-                </motion.div>
+                </Reveal>
               ))}
             </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.7 }}
+          <Reveal
+            variant="scale"
+            amount={0.3}
             className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 shadow-2xl"
           >
             <Image
@@ -82,10 +77,12 @@ export function WhyChooseUs() {
             <div className="absolute bottom-6 left-6 right-6">
               <div className="glass-card p-4">
                 <p className="font-display text-xl text-white">Trusted by 500+ NJ homeowners</p>
-                <p className="mt-1 text-xs text-steel-200">From Clifton to Montclair — and every block in between.</p>
+                <p className="mt-1 text-xs text-steel-200">
+                  From Clifton to Montclair — and every block in between.
+                </p>
               </div>
             </div>
-          </motion.div>
+          </Reveal>
         </div>
       </div>
     </section>
