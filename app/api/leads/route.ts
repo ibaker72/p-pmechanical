@@ -4,6 +4,7 @@ import { captureLead } from '@/lib/leads';
 import { sendSavingsGuide } from '@/lib/resend';
 import { clientIp, getIdempotent, limitForm, limitWebhook, setIdempotent } from '@/lib/ratelimit';
 import { emitEvent } from '@/lib/events';
+import { enrichLeadWithOpenClaw } from '@/lib/openclaw/lead-enrichment';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -87,6 +88,10 @@ export async function POST(req: Request) {
       lead_id: result.id,
       lead,
     }).catch(() => undefined);
+
+    // Fire-and-forget OpenClaw enrichment — emails the owner an AI summary +
+    // callback script. No-ops when OpenClaw is disabled; never blocks the lead.
+    enrichLeadWithOpenClaw(lead).catch(() => undefined);
 
     const warnings: string[] = [];
     if (result.supabaseError) warnings.push(`storage: ${result.supabaseError}`);

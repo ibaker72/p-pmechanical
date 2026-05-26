@@ -41,6 +41,25 @@ export const envSchema = z.object({
   // Client-side overrides
   NEXT_PUBLIC_BUSINESS_PHONE: z.string().optional(),
   NEXT_PUBLIC_BUSINESS_PHONE_DISPLAY: z.string().optional(),
+
+  // OpenClaw (server-side AI gateway for lead automation / prompt workflows).
+  // The API key is server-only and must never be exposed to the browser.
+  OPENCLAW_ENABLED: z.enum(['true', 'false']).optional().describe('Feature flag for OpenClaw'),
+  OPENCLAW_BASE_URL: url.optional().describe('OpenClaw gateway base URL'),
+  OPENCLAW_API_KEY: nonEmpty.optional().describe('OpenClaw API key — server only, never public'),
+  OPENCLAW_MODEL: nonEmpty.optional().describe('Default model for OpenClaw calls'),
+  OPENCLAW_CHAT_PATH: nonEmpty
+    .optional()
+    .describe('Override chat path (default /v1/chat/completions)'),
+  OPENCLAW_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('Request timeout (ms)'),
+  OPENCLAW_INTERNAL_SECRET: nonEmpty
+    .optional()
+    .describe('If set, OpenClaw routes require a matching x-internal-secret header'),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -8,6 +8,27 @@ function Script({ data }: { data: object }) {
   );
 }
 
+/**
+ * Generic JSON-LD renderer. Pass an object (or array of objects) built by the
+ * helpers in lib/seo/schema.ts. Null/undefined entries are skipped so callers
+ * can do `<JsonLd data={buildFaqSchema(faqs)} />` without guarding.
+ */
+export function JsonLd({
+  data,
+}: {
+  data: object | (object | null | undefined)[] | null | undefined;
+}) {
+  const items = (Array.isArray(data) ? data : [data]).filter(Boolean) as object[];
+  if (!items.length) return null;
+  return (
+    <>
+      {items.map((item, i) => (
+        <Script key={i} data={item} />
+      ))}
+    </>
+  );
+}
+
 export function LocalBusinessSchema({ city }: { city?: string }) {
   return (
     <Script
