@@ -2,6 +2,7 @@ import { Hero } from '@/components/home/Hero';
 import { StatsBar } from '@/components/home/StatsBar';
 import { TrustBadges } from '@/components/home/TrustBadges';
 import { ServicesGrid } from '@/components/home/ServicesGrid';
+import { HelpChooser } from '@/components/home/HelpChooser';
 import { WhyChooseUs } from '@/components/home/WhyChooseUs';
 import { LeadMagnetSection } from '@/components/home/LeadMagnetSection';
 import { ServiceAreasMap } from '@/components/home/ServiceAreasMap';
@@ -20,6 +21,7 @@ export default function HomePage() {
       <StatsBar />
       <TrustBadges />
       <ServicesGrid />
+      <HelpChooser />
       <WhyChooseUs />
       <LeadMagnetSection />
       <ServiceAreasMap />

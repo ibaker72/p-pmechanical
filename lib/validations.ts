@@ -8,6 +8,12 @@ export const contactSchema = z.object({
   phone: z.string().regex(phoneRegex, 'Enter a valid phone number'),
   service_type: z.string().optional().nullable(),
   city: z.string().optional().nullable(),
+  zip: z
+    .string()
+    .regex(/^\d{5}(-\d{4})?$/, 'Enter a valid ZIP')
+    .optional()
+    .or(z.literal('')),
+  urgency: z.string().optional().nullable(),
   message: z.string().min(5, 'A short message helps us prepare').max(2000),
 });
 export type ContactInput = z.infer<typeof contactSchema>;
