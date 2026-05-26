@@ -10,7 +10,7 @@
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-ink-950 text-steel-50 antialiased font-sans;
+    @apply bg-ink-950 font-sans text-steel-50 antialiased;
     background-image:
       radial-gradient(1200px 600px at 80% -10%, rgba(249, 115, 22, 0.08), transparent),
       radial-gradient(800px 400px at -10% 30%, rgba(31, 41, 55, 0.6), transparent);
@@ -19,7 +19,12 @@
   ::selection {
     @apply bg-ember-500/40 text-white;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display tracking-tight;
   }
   a {
@@ -42,45 +47,94 @@
     @apply h-px w-8 bg-ember-500/70;
   }
   .heading-display {
-    @apply font-display text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-white;
+    @apply font-display text-4xl leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl;
   }
   .heading-section {
-    @apply font-display text-3xl sm:text-4xl lg:text-5xl leading-tight text-white;
+    @apply font-display text-3xl leading-tight text-white sm:text-4xl lg:text-5xl;
   }
-  .text-balance { text-wrap: balance; }
+  .text-balance {
+    text-wrap: balance;
+  }
   .glass-card {
     @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md;
   }
   .glow-border:hover {
-    @apply shadow-ember border-ember-500/40;
+    @apply border-ember-500/40 shadow-ember;
   }
   .skip-link {
-    @apply sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100]
-           focus:rounded-md focus:bg-ember-500 focus:px-4 focus:py-2 focus:text-ink-950 focus:font-semibold;
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-md focus:bg-ember-500 focus:px-4 focus:py-2 focus:font-semibold focus:text-ink-950;
   }
 }
 
-@keyframes fade-up {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* Hero entrance: transform only (no opacity) so the LCP heading is painted
+   at full opacity on the first frame and is not delayed by the animation. */
+@keyframes hero-rise {
+  from {
+    transform: translateY(24px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Scroll-reveal used by below-the-fold sections. Replaces Framer Motion's
+   whileInView with a ~1KB IntersectionObserver instead of the full library.
+   Elements ship hidden in SSR HTML and are revealed once observed. */
+.reveal {
+  opacity: 0;
+  transition:
+    opacity 0.6s ease-out,
+    transform 0.6s ease-out;
+}
+.reveal-up {
+  transform: translateY(24px);
+}
+.reveal-left {
+  transform: translateX(-20px);
+}
+.reveal-scale {
+  transform: scale(0.96);
+}
+.reveal[data-show='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes testimonial-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @layer utilities {
-  .animate-fade-up {
-    animation: fade-up 0.7s ease-out both;
+  .animate-hero-rise {
+    animation: hero-rise 0.6s ease-out both;
+  }
+  .animate-testimonial-in {
+    animation: testimonial-in 0.4s ease-out both;
   }
   .text-shadow-hero {
     text-shadow: 0 4px 30px rgba(0, 0, 0, 0.55);
   }
   .mask-fade-b {
     -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent);
-            mask-image: linear-gradient(to bottom, black 70%, transparent);
+    mask-image: linear-gradient(to bottom, black 70%, transparent);
   }
   .heat-shimmer::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(120deg, transparent 30%, rgba(255, 155, 34, 0.08) 50%, transparent 70%);
+    background: linear-gradient(
+      120deg,
+      transparent 30%,
+      rgba(255, 155, 34, 0.08) 50%,
+      transparent 70%
+    );
     transform: translateX(-100%);
     animation: shimmer 6s linear infinite;
     pointer-events: none;
@@ -89,29 +143,52 @@
 
 /* Prose for blog posts */
 .prose-pp {
-  @apply text-steel-100 leading-relaxed;
+  @apply leading-relaxed text-steel-100;
 }
 .prose-pp h2 {
-  @apply font-display text-3xl text-white mt-12 mb-4;
+  @apply mb-4 mt-12 font-display text-3xl text-white;
 }
 .prose-pp h3 {
-  @apply font-display text-2xl text-white mt-8 mb-3;
+  @apply mb-3 mt-8 font-display text-2xl text-white;
 }
 .prose-pp p {
   @apply my-4 text-steel-200;
 }
-.prose-pp ul, .prose-pp ol {
+.prose-pp ul,
+.prose-pp ol {
   @apply my-4 ml-6 space-y-2 text-steel-200;
 }
-.prose-pp ul { @apply list-disc; }
-.prose-pp ol { @apply list-decimal; }
+.prose-pp ul {
+  @apply list-disc;
+}
+.prose-pp ol {
+  @apply list-decimal;
+}
 .prose-pp a {
   @apply text-ember-300 underline decoration-ember-500/40 underline-offset-4 hover:text-ember-200;
 }
 .prose-pp blockquote {
   @apply my-6 border-l-4 border-ember-500 bg-white/[0.03] px-5 py-3 italic text-steel-100;
 }
-.prose-pp strong { @apply text-white; }
+.prose-pp strong {
+  @apply text-white;
+}
 .prose-pp code {
-  @apply rounded bg-ink-800 px-1.5 py-0.5 text-ember-200 text-sm;
+  @apply rounded bg-ink-800 px-1.5 py-0.5 text-sm text-ember-200;
+}
+
+/* Honor user motion preferences: disable decorative/entrance animations and
+   ensure all reveal content is fully visible without motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
 }

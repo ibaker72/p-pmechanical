@@ -1,8 +1,6 @@
-'use client';
-
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Snowflake, Wind, Flame, Siren, ShieldCheck, Building2, ArrowUpRight } from 'lucide-react';
+import { Reveal } from '@/components/ui/Reveal';
 
 const CARDS = [
   {
@@ -61,13 +59,7 @@ export function ServicesGrid() {
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {CARDS.map((card, i) => (
-            <motion.div
-              key={card.href}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.5, delay: i * 0.05 }}
-            >
+            <Reveal key={card.href} variant="up" delay={i * 0.05}>
               <Link
                 href={card.href}
                 className="group relative flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-ember-400/50 hover:shadow-ember"
@@ -82,7 +74,7 @@ export function ServicesGrid() {
                   <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </span>
               </Link>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>

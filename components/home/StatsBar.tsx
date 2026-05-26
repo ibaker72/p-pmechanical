@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { Reveal, useInViewOnce } from '@/components/ui/Reveal';
 
 type Stat = {
   value: number;
@@ -19,8 +19,7 @@ const STATS: Stat[] = [
 ];
 
 function Counter({ stat }: { stat: Stat }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const { ref, inView } = useInViewOnce<HTMLSpanElement>(0.5);
   const [val, setVal] = useState(stat.raw ? stat.value : 0);
 
   useEffect(() => {
@@ -54,21 +53,16 @@ function Counter({ stat }: { stat: Stat }) {
 
 export function StatsBar() {
   return (
-    <section className="relative -mt-12 z-10">
+    <section className="relative z-10 -mt-12">
       <div className="container-wide">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6 }}
+        <Reveal
+          variant="up"
+          amount={0.3}
           className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-md md:grid-cols-4"
         >
           {STATS.map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-ink-900/60 px-6 py-8 text-center"
-            >
-              <div className="font-display text-4xl sm:text-5xl text-white">
+            <div key={stat.label} className="bg-ink-900/60 px-6 py-8 text-center">
+              <div className="font-display text-4xl text-white sm:text-5xl">
                 <Counter stat={stat} />
               </div>
               <div className="mt-2 text-xs font-semibold uppercase tracking-widest text-ember-300">
@@ -76,7 +70,7 @@ export function StatsBar() {
               </div>
             </div>
           ))}
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   );
