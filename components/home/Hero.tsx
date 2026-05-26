@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { Phone, ShieldCheck, Clock, FileText, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,8 +18,9 @@ export function Hero() {
         aria-hidden
         className="mask-fade-b absolute inset-0 bg-grid-faint bg-[length:64px_64px] opacity-30"
       />
-      {/* Particles */}
-      <div aria-hidden className="absolute inset-0 overflow-hidden">
+      {/* Particles — desktop only; skipped on mobile to avoid 14 infinite
+          animations competing with the hero paint on low-power devices. */}
+      <div aria-hidden className="absolute inset-0 hidden overflow-hidden sm:block">
         {Array.from({ length: 14 }).map((_, i) => (
           <span
             key={i}
@@ -37,7 +36,7 @@ export function Hero() {
       </div>
 
       <div className="container-wide relative pb-24 pt-20 lg:pb-32 lg:pt-28">
-        <div className="max-w-3xl animate-fade-up">
+        <div className="animate-hero-rise max-w-3xl">
           <span className="eyebrow mb-6">Clifton · Passaic · Paterson · North Jersey</span>
           <h1 className="heading-display text-shadow-hero text-balance">
             North Jersey&apos;s

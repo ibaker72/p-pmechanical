@@ -11,7 +11,7 @@ import './globals.css';
 
 const display = Barlow_Condensed({
   subsets: ['latin'],
-  weight: ['500', '600', '700', '800'],
+  weight: ['500', '600', '700'],
   variable: '--font-display',
   display: 'swap',
 });
@@ -87,7 +87,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <HvacBusinessSchema />
         <OrganizationSchema />
-        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
         <link
           rel="alternate"
           type="text/plain"
