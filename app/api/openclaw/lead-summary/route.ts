@@ -1,0 +1,46 @@
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { runPrompt } from '@/lib/openclaw/client';
+import { leadSummaryPrompt } from '@/lib/openclaw/prompts';
+import { guardOpenClawRoute, parseJson } from '@/lib/openclaw/guard';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const schema = z.object({
+  name: z.string().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
+  service: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  message: z.string().optional().nullable(),
+  urgency: z.string().optional().nullable(),
+  sourcePage: z.string().optional().nullable(),
+});
+
+export async function POST(req: Request) {
+  const guard = await guardOpenClawRoute(req);
+  if (!guard.ok) return guard.response;
+
+  const parsed = await parseJson(req);
+  if (!parsed.ok) return parsed.response;
+
+  const input = schema.safeParse(parsed.data);
+  if (!input.success) {
+    return NextResponse.json(
+      { ok: false, error: 'validation_failed', issues: input.error.issues },
+      { status: 400 },
+    );
+  }
+
+  const { system, user } = leadSummaryPrompt(input.data);
+  const result = await runPrompt(system, user, { temperature: 0.3, maxTokens: 600 });
+
+  if (!result.ok) {
+    return NextResponse.json(
+      { ok: false, text: '', error: result.error ?? 'openclaw_error' },
+      { status: 200 },
+    );
+  }
+  return NextResponse.json({ ok: true, text: result.text });
+}
