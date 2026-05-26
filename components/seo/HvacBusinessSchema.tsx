@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalhvac.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalllc.com';
 
 const HVAC_BUSINESS_SCHEMA = {
   '@context': 'https://schema.org',

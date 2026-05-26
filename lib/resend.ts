@@ -79,7 +79,7 @@ export async function sendSavingsGuide(email: string, name?: string) {
     html: `<div style="font-family:system-ui,sans-serif;max-width:600px;color:#111;">
       <h2 style="color:#dc5a06;">Here is your free guide${name ? ', ' + name : ''}.</h2>
       <p>12 practical, NJ-specific ways to lower your energy bill before the next heating or cooling season.</p>
-      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalhvac.com'}/downloads/pp-hvac-savings-guide.pdf" style="display:inline-block;background:#dc5a06;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Download the Guide (PDF)</a></p>
+      <p><a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalllc.com'}/downloads/pp-hvac-savings-guide.pdf" style="display:inline-block;background:#dc5a06;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Download the Guide (PDF)</a></p>
       <p style="margin-top:24px;color:#555;font-size:13px;">If you want a quote on any of the upgrades in the guide, hit reply — we will run the numbers for your home.</p>
     </div>`,
   });

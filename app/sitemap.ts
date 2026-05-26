@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { RESIDENTIAL_SERVICES, COMMERCIAL_SERVICES, LOCATIONS } from '@/lib/constants';
 import { getAllPosts } from '@/lib/blog';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalhvac.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalllc.com';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

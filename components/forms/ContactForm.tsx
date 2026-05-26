@@ -32,12 +32,20 @@ export function ContactForm({ defaultCity, source = 'contact_form' }: ContactFor
   async function onSubmit(values: ContactInput, event?: React.BaseSyntheticEvent) {
     setStatus('submitting');
     const hp = readHoneypot(event);
+    // Fold urgency + ZIP into the message so they reach the owner email and
+    // lead record without a schema change.
+    const context = [
+      values.urgency ? `Urgency: ${values.urgency}` : null,
+      values.zip ? `ZIP: ${values.zip}` : null,
+    ].filter(Boolean);
+    const message = context.length ? `${context.join(' · ')}\n\n${values.message}` : values.message;
     try {
       const res = await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...values,
+          message,
           city: values.city || defaultCity || null,
           source,
           website_url: hp,
@@ -124,6 +132,22 @@ export function ContactForm({ defaultCity, source = 'contact_form' }: ContactFor
               </option>
             ))}
           </Select>
+        </div>
+      </div>
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <Label htmlFor="c-urgency">How urgent is it?</Label>
+          <Select id="c-urgency" {...register('urgency')}>
+            <option value="">Select urgency</option>
+            <option value="Emergency today">Emergency today</option>
+            <option value="This week">This week</option>
+            <option value="Planning ahead">Planning ahead</option>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="c-zip">ZIP code</Label>
+          <Input id="c-zip" inputMode="numeric" placeholder="07011" {...register('zip')} />
+          <FieldError>{errors.zip?.message}</FieldError>
         </div>
       </div>
       <div>
