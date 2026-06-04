@@ -124,7 +124,6 @@ const KNOWN_BAD_MERGES: Array<[RegExp, string]> = [
   [/\bboilerservice\b/gi, 'boiler service'],
   [/\bboilerinstallation\b/gi, 'boiler installation'],
   [/\bmini splitinstallation\b/gi, 'mini split installation'],
-  [/\bminisplit\b/gi, 'mini split'],
   [/\bductworkinstallation\b/gi, 'ductwork installation'],
   [/\bthermostatreplacement\b/gi, 'thermostat replacement'],
   [/\bservicearea\b/gi, 'service area'],
@@ -145,6 +144,31 @@ const KNOWN_BAD_MERGES: Array<[RegExp, string]> = [
   [/\bincludingthose\b/gi, 'including those'],
   [/\borsend\b/gi, 'or send'],
   [/\borcooling\b/gi, 'or cooling'],
+  // Second batch of production-observed merges (Fair Lawn saved row)
+  [/\bContractorin\b/g, 'Contractor in'],
+  [/\bafull\b/g, 'a full'],
+  [/\bnotpractical\b/gi, 'not practical'],
+  [/\bsteamsystems\b/gi, 'steam systems'],
+  [/\baspossible\b/gi, 'as possible'],
+  [/\bInaddition\b/g, 'In addition'],
+  [/\bJerseytowns\b/g, 'Jersey towns'],
+  [/\bacall\b/g, 'a call'],
+  [/\bOurgoal\b/g, 'Our goal'],
+  [/\bthebroader\b/gi, 'the broader'],
+  [/\bfreeestimate\b/gi, 'free estimate'],
+  [/\bfreeestimates\b/gi, 'free estimates'],
+  [/\bistoo\b/gi, 'is too'],
+  [/\bcandesign\b/gi, 'can design'],
+  [/\binstallationsand\b/gi, 'installations and'],
+  [/\binstallationand\b/gi, 'installation and'],
+  [/\brepairsand\b/gi, 'repairs and'],
+  [/\brepairand\b/gi, 'repair and'],
+  [/\bschedulingas\b/gi, 'scheduling as'],
+  // Standalone "minisplit" -> "mini split". Real Mitsubishi / brand product
+  // lines are written "M-Series" or "Mr. Slim" and don't trigger this. Plural
+  // form goes first so the singular regex doesn't shadow it.
+  [/\bminisplits\b/gi, 'mini splits'],
+  [/\bminisplit\b/gi, 'mini split'],
   // Common English glue words
   [/\bhomesand\b/gi, 'homes and'],
   [/\bbusinessesin\b/gi, 'businesses in'],
@@ -187,16 +211,38 @@ const SUSPICIOUS_MERGE_PATTERNS: RegExp[] = [
 ];
 
 // Final-pass sanity checks — these complement the merge patterns above and
-// fire on shapes that are nearly always wrong in real prose.
+// fire on shapes that are nearly always wrong in real prose. Anything caught
+// here is a survivor that should be reviewed (or that my explicit fix above
+// failed to remove). dry_run surfaces these so the operator sees the problem
+// BEFORE the page is saved.
 const POST_SANITIZE_WARNING_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
-  // Period or comma followed directly by an uppercase letter, no space.
-  { pattern: /[.,;:][A-Z]/, label: 'punctuation_no_space' },
+  // Period / comma / semicolon / colon followed directly by an uppercase
+  // letter, no space.
+  { pattern: /[.!?;:][A-Z]/, label: 'punctuation_no_space' },
+  // Comma directly followed by a lowercase letter — almost always a missing
+  // space ("wave,waiting", "work,and"). Digits after a comma (1,000) are
+  // intentionally excluded by the [a-z] character class.
+  { pattern: /,[a-z]/, label: 'comma_no_space' },
+  // Em dash (—) or en dash (–) without a space on at least one side.
+  { pattern: /\S[—–]|[—–]\S/, label: 'em_dash_no_space' },
   // Broken email address with a space inside the TLD boundary.
   { pattern: /@[\w-]+\.\s+[a-z]{2,4}\b/, label: 'broken_email' },
   // Multi-word NJ city names glued: e.g. FairLawn, EastOrange, JerseyCity.
   {
     pattern: /\b(?:Fair|Elmwood|Little|Woodland|Jersey|East|North|New)[A-Z][a-z]+\b/,
     label: 'glued_proper_noun',
+  },
+  // CamelCase inside a single token (e.g. "HVACservice", "OurGoal") — almost
+  // always a glued merge in this domain. The FALSE_POSITIVE_WHITELIST below
+  // protects normal English. Tokens with internal [a-z][A-Z] are the signal.
+  { pattern: /[a-z][A-Z]/, label: 'camel_case_merge' },
+  // Specific known-bad glue tokens. If any of these survive my explicit
+  // fixes (e.g. because of a stale deploy or a regex regression), dry_run
+  // will flag them by name.
+  {
+    pattern:
+      /\b(?:Contractorin|afull|notpractical|steamsystems|aspossible|Inaddition|Jerseytowns|acall|Ourgoal|thebroader|freeestimates?|istoo|candesign|installationsand?|repairsand?|schedulingas|modernmulti|areaand|maintenancecontracts|includingthose|orsend|orcooling|homesand|businessesin|contactus|schedulean|HVACservices?|HVACrepair|HVACinstallation|HVACmaintenance|HVACcontractor|ACrepair|ACinstallation|ACservice|heatingrepair|boilerrepair|boilerservice|emergencyservice|servicearea|serviceareas|minisplit|minisplits|ora|ofHVAC)\b/i,
+    label: 'known_glue_survivor',
   },
 ];
 
@@ -268,8 +314,14 @@ export function normalizeTextSpacing(text: string): string {
       // Collapse runs of whitespace (but preserve single newlines if any).
       .replace(/[ \t]+/g, ' ')
       .replace(/ ?\n ?/g, '\n')
-      // Ensure a single space after sentence punctuation.
+      // Ensure a single space after sentence punctuation when directly
+      // followed by a letter. Letters only — we don't touch "1,000" or
+      // version-like "v1.2.3".
       .replace(/([.!?,;:])([A-Za-z])/g, '$1 $2')
+      // Em / en dash should have a single space on each side when it joins
+      // phrases (e.g. "price— it" -> "price — it", "fast—same day" ->
+      // "fast — same day"). Tolerates any existing surrounding whitespace.
+      .replace(/\s*([—–])\s*/g, ' $1 ')
       // Space between a digit and a letter ("100homes" -> "100 homes"),
       // but never split "24/7" or numeric units like "07011".
       .replace(/(\d)([A-Za-z])/g, (m, d, l) => (/[/-]/.test(m) ? m : `${d} ${l}`))

@@ -228,6 +228,152 @@ const tests: TestCase[] = [
         m.token.includes('punctuation_no_space'),
       ),
   },
+  // ---- Second-batch production survivors (Fair Lawn saved row) ----
+  {
+    name: 'sanitize: Contractorin -> Contractor in',
+    run: () => sanitizeSection('HVAC Contractorin Fair Lawn').includes('Contractor in'),
+  },
+  {
+    name: 'sanitize: afull -> a full',
+    run: () => sanitizeSection('for afull range').includes('a full'),
+  },
+  {
+    name: 'sanitize: notpractical -> not practical',
+    run: () => sanitizeSection('is notpractical for these homes').includes('not practical'),
+  },
+  {
+    name: 'sanitize: steamsystems -> steam systems',
+    run: () => sanitizeSection('older steamsystems still operating').includes('steam systems'),
+  },
+  {
+    name: 'sanitize: aspossible -> as possible',
+    run: () => sanitizeSection('as soon aspossible').includes('as possible'),
+  },
+  {
+    name: 'sanitize: Inaddition -> In addition',
+    run: () => sanitizeSection('Inaddition to repair work').includes('In addition'),
+  },
+  {
+    name: 'sanitize: Jerseytowns -> Jersey towns',
+    run: () => sanitizeSection('North Jerseytowns including Fair Lawn').includes('Jersey towns'),
+  },
+  {
+    name: 'sanitize: acall -> a call',
+    run: () => sanitizeSection('give us acall today').includes('a call'),
+  },
+  {
+    name: 'sanitize: Ourgoal -> Our goal',
+    run: () => sanitizeSection('Ourgoal is to make HVAC simple').includes('Our goal'),
+  },
+  {
+    name: 'sanitize: thebroader -> the broader',
+    run: () => sanitizeSection('serving thebroader region').includes('the broader'),
+  },
+  {
+    name: 'sanitize: freeestimate -> free estimate',
+    run: () => sanitizeSection('request a freeestimate online').includes('free estimate'),
+  },
+  {
+    name: 'sanitize: istoo -> is too',
+    run: () => sanitizeSection('no job istoo small').includes('is too'),
+  },
+  {
+    name: 'sanitize: candesign -> can design',
+    run: () => sanitizeSection('our team candesign a system').includes('can design'),
+  },
+  {
+    name: 'sanitize: installationsand -> installations and',
+    run: () => sanitizeSection('do installationsand repairs').includes('installations and'),
+  },
+  {
+    name: 'sanitize: schedulingas -> scheduling as',
+    run: () => sanitizeSection('flexible schedulingas needed').includes('scheduling as'),
+  },
+  {
+    name: 'sanitize: minisplit (no s) -> mini split',
+    run: () => sanitizeSection('minisplit install').includes('mini split'),
+  },
+  {
+    name: 'sanitize: minisplits -> mini splits',
+    run: () => sanitizeSection('we install minisplits').includes('mini splits'),
+  },
+
+  // ---- Em-dash spacing ----
+  {
+    name: 'sanitize: price— it -> price — it (add leading space)',
+    run: () => sanitizeSection('a fair price— it pays for itself').includes('price — it'),
+  },
+  {
+    name: 'sanitize: fast—same -> fast — same (both sides)',
+    run: () => sanitizeSection('fast—same day').includes('fast — same'),
+  },
+  {
+    name: 'sanitize: keeps existing " — " unchanged',
+    run: () => sanitizeSection('clean — pricing — clear').includes(' — '),
+  },
+
+  // ---- Comma + digit boundary ----
+  {
+    name: 'sanitize: 1,000 stays 1,000 (no false split)',
+    run: () => sanitizeSection('over 1,000 homes').includes('1,000'),
+  },
+
+  // ---- Warning patterns ----
+  {
+    name: 'detectSuspiciousMerges: catches comma_no_space survivor',
+    run: () =>
+      detectSuspiciousMerges('heat wave,waiting').some((m) => m.token.includes('comma_no_space')),
+  },
+  {
+    name: 'detectSuspiciousMerges: catches em_dash_no_space survivor',
+    run: () =>
+      detectSuspiciousMerges('price— it').some((m) => m.token.includes('em_dash_no_space')),
+  },
+  {
+    name: 'detectSuspiciousMerges: catches known_glue_survivor (freeestimate)',
+    run: () =>
+      detectSuspiciousMerges('a freeestimate online').some((m) =>
+        m.token.includes('known_glue_survivor'),
+      ),
+  },
+  {
+    name: 'detectSuspiciousMerges: catches known_glue_survivor (Ourgoal)',
+    run: () =>
+      detectSuspiciousMerges('Ourgoal is X').some((m) => m.token.includes('known_glue_survivor')),
+  },
+  {
+    name: 'detectSuspiciousMerges: catches camel_case_merge (chooseP&P)',
+    run: () =>
+      detectSuspiciousMerges('Why chooseP&P').some((m) => m.token.includes('camel_case_merge')),
+  },
+
+  // ---- False positives: real English words should NOT warn ----
+  ...[
+    'another',
+    'anomaly',
+    'orange',
+    'organic',
+    'office',
+    'often',
+    'notice',
+    'notable',
+    'theatre',
+    'theme',
+    'isolate',
+    'aspect',
+    'assemble',
+    'industry',
+    'include',
+    'oranges',
+    'inside',
+  ].map((w) => ({
+    name: `sanitize: real word "${w}" survives intact`,
+    run: () => {
+      const out = sanitizeSection(`The ${w} is fine.`);
+      return out.includes(w);
+    },
+  })),
+
   {
     name: 'detectSuspiciousMerges: no false positive on clean text',
     run: () =>
