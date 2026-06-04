@@ -11,6 +11,7 @@ import {
 import { sanitizeSections, normalizeCity, normalizeState } from '@/lib/geo/sanitize';
 import { buildLocationPageHtml } from '@/lib/geo/build-location-html';
 import { upsertGeoPage } from '@/lib/geo/repository';
+import { getGeoEnvDiagnostics } from '@/lib/geo/supabase-admin';
 import { isStaticLocationSlug } from '@/lib/geo/locations';
 import { buildServiceAreaSlug } from '@/lib/seo/site';
 
@@ -82,6 +83,25 @@ export async function POST(req: Request) {
       },
       { status: 409 },
     );
+  }
+
+  // Fail fast when we know the upsert will fail: if dry_run is false but the
+  // service-role key isn't configured, don't waste an Anthropic call.
+  if (!dryRun) {
+    const diag = getGeoEnvDiagnostics();
+    if (!diag.service_role_key_present || !diag.supabase_url_present) {
+      return json(
+        {
+          ok: false,
+          stage: 'supabase_config',
+          error: diag.service_role_key_present
+            ? 'missing_supabase_url'
+            : 'missing_service_role_key',
+          diagnostics: diag,
+        },
+        { status: 500 },
+      );
+    }
   }
 
   const callResult = await callAnthropicWithTool<GeneratedSections>({
@@ -170,7 +190,14 @@ export async function POST(req: Request) {
 
   if (!saved.ok) {
     return json(
-      { ok: false, stage: 'supabase', error: saved.error ?? 'unknown_db_error', warnings },
+      {
+        ok: false,
+        stage: saved.stage,
+        error: saved.error,
+        ...(saved.hint ? { hint: saved.hint } : {}),
+        ...(saved.diagnostics ? { diagnostics: saved.diagnostics } : {}),
+        warnings,
+      },
       { status: 500 },
     );
   }
@@ -180,10 +207,10 @@ export async function POST(req: Request) {
     dry_run: false,
     slug,
     saved: {
-      id: saved.row?.id,
-      slug: saved.row?.slug,
-      is_published: saved.row?.is_published,
-      updated_at: saved.row?.updated_at,
+      id: saved.row.id,
+      slug: saved.row.slug,
+      is_published: saved.row.is_published,
+      updated_at: saved.row.updated_at,
     },
     preview,
     warnings,

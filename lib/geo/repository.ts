@@ -1,8 +1,17 @@
 // Server-only Supabase access for the AI-generated geo_pages table.
-// Uses the existing service-role client. RLS lets anon read published rows;
-// only the service role can write.
+//
+// Writes (upsert) use the dedicated service-role client from
+// lib/geo/supabase-admin.ts, which is re-created per call and sets explicit
+// apikey + Authorization headers so PostgREST recognizes the role and
+// bypasses RLS on geo_pages.
+//
+// Reads use the same admin client server-side. Public read for /locations
+// rendering also works against the published rows because the RLS policy
+// `geo_pages public read published` allows anon to SELECT where
+// is_published = true — but the renderer calls this module server-side, so
+// it uses the admin client either way.
 
-import { getServiceSupabase } from '@/lib/supabase';
+import { getGeoServiceClient, getGeoEnvDiagnostics } from './supabase-admin';
 import type { FaqEntry } from './build-location-html';
 
 export type GeoPageRow = {
@@ -37,17 +46,30 @@ export type GeoPageUpsert = {
   is_published: boolean;
 };
 
-export async function upsertGeoPage(input: GeoPageUpsert): Promise<{
-  ok: boolean;
-  row?: GeoPageRow;
-  error?: string;
-}> {
-  const supabase = getServiceSupabase();
-  if (!supabase) return { ok: false, error: 'supabase_unconfigured' };
+export type UpsertResult =
+  | { ok: true; row: GeoPageRow }
+  | {
+      ok: false;
+      stage: 'supabase_config' | 'supabase_write';
+      error: string;
+      hint?: string;
+      diagnostics?: ReturnType<typeof getGeoEnvDiagnostics>;
+    };
+
+export async function upsertGeoPage(input: GeoPageUpsert): Promise<UpsertResult> {
+  const result = getGeoServiceClient();
+  if (!result.ok) {
+    return {
+      ok: false,
+      stage: result.failure.stage,
+      error: result.failure.error,
+      diagnostics: getGeoEnvDiagnostics(),
+    };
+  }
 
   const published_at = input.is_published ? new Date().toISOString() : null;
 
-  const { data, error } = await supabase
+  const { data, error } = await result.client
     .from('geo_pages')
     .upsert(
       {
@@ -69,15 +91,31 @@ export async function upsertGeoPage(input: GeoPageUpsert): Promise<{
     .select('*')
     .single();
 
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    const msg = error.message || 'unknown_db_error';
+    // PostgREST surfaces RLS denials and missing GRANTs both as
+    // "permission denied". Surface a hint so the operator knows where to
+    // look — without exposing the key.
+    const hint = /permission denied/i.test(msg)
+      ? 'PostgREST returned permission denied. This means the request reached Supabase but was NOT authenticated as service_role. Re-check that SUPABASE_SERVICE_ROLE_KEY in Vercel is the project\'s service_role key (starts with eyJ... and the JWT role claim is "service_role"), not the anon key.'
+      : undefined;
+    return {
+      ok: false,
+      stage: 'supabase_write',
+      error: msg,
+      hint,
+      diagnostics: getGeoEnvDiagnostics(),
+    };
+  }
+
   return { ok: true, row: data as GeoPageRow };
 }
 
 export async function getPublishedGeoPageBySlug(slug: string): Promise<GeoPageRow | null> {
-  const supabase = getServiceSupabase();
-  if (!supabase) return null;
+  const result = getGeoServiceClient();
+  if (!result.ok) return null;
 
-  const { data, error } = await supabase
+  const { data, error } = await result.client
     .from('geo_pages')
     .select('*')
     .eq('slug', slug)
@@ -91,10 +129,10 @@ export async function getPublishedGeoPageBySlug(slug: string): Promise<GeoPageRo
 export async function listPublishedGeoPages(): Promise<
   Pick<GeoPageRow, 'slug' | 'city' | 'state' | 'updated_at'>[]
 > {
-  const supabase = getServiceSupabase();
-  if (!supabase) return [];
+  const result = getGeoServiceClient();
+  if (!result.ok) return [];
 
-  const { data, error } = await supabase
+  const { data, error } = await result.client
     .from('geo_pages')
     .select('slug, city, state, updated_at')
     .eq('is_published', true)
