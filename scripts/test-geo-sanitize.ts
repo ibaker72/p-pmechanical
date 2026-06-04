@@ -102,6 +102,140 @@ const tests: TestCase[] = [
     run: () => applyKnownBadMerges('24/7 emergencyservice').includes('emergency service'),
   },
 
+  // ---- Production-observed merges (Fair Lawn dry_run) ----
+  {
+    name: 'sanitize: FairLawn -> Fair Lawn',
+    run: () => sanitizeSection('serving FairLawn homes').includes('Fair Lawn'),
+  },
+  {
+    name: 'sanitize: P&PMechanical -> P&P Mechanical LLC',
+    run: () => sanitizeSection('call P&PMechanical today').includes('P&P Mechanical LLC'),
+  },
+  {
+    name: 'sanitize: cascading ChooseP&PMechanical -> Choose P&P Mechanical LLC',
+    run: () =>
+      sanitizeSection('Why ChooseP&PMechanical?').includes('Why Choose P&P Mechanical LLC?'),
+  },
+  {
+    name: 'sanitize: summer ora -> summer or a',
+    run: () => sanitizeSection('summer ora cool fall').includes('summer or a cool fall'),
+  },
+  {
+    name: 'sanitize: range ofHVAC -> range of HVAC',
+    run: () => sanitizeSection('range ofHVAC services').includes('range of HVAC services'),
+  },
+  {
+    name: 'sanitize: option.Contact -> option. Contact',
+    run: () => sanitizeSection('the best option.Contact us today').includes('option. Contact'),
+  },
+  {
+    name: 'sanitize: email rejoin (service@ppmechanicalhvac. com)',
+    run: () =>
+      sanitizeSection('Email service@ppmechanicalhvac. com today').includes(
+        'service@ppmechanicalhvac.com',
+      ),
+  },
+  {
+    name: 'sanitize: Why ChooseP&P -> Why Choose P&P',
+    run: () => sanitizeSection('Why ChooseP&P Mechanical LLC?').includes('Why Choose P&P'),
+  },
+  {
+    name: 'sanitize: modernmulti-zone -> modern multi-zone',
+    run: () => sanitizeSection('a modernmulti-zone install').includes('modern multi-zone'),
+  },
+  {
+    name: 'sanitize: areaand -> area and',
+    run: () => sanitizeSection('service areaand neighboring towns').includes('area and'),
+  },
+  {
+    name: 'sanitize: homeowners,landlords -> homeowners, landlords',
+    run: () =>
+      sanitizeSection('homeowners,landlords, and managers').includes('homeowners, landlords'),
+  },
+  {
+    name: 'sanitize: Fair Lawn.On -> Fair Lawn. On',
+    run: () =>
+      sanitizeSection('We serve Fair Lawn.On weekends we book ahead.').includes('Fair Lawn. On'),
+  },
+  {
+    name: 'sanitize: maintenancecontracts -> maintenance contracts',
+    run: () =>
+      sanitizeSection('We offer maintenancecontracts for landlords').includes(
+        'maintenance contracts',
+      ),
+  },
+  {
+    name: 'sanitize: includingthose -> including those',
+    run: () =>
+      sanitizeSection('homes includingthose with old radiators').includes('including those'),
+  },
+  {
+    name: 'sanitize: orsend -> or send',
+    run: () => sanitizeSection('Call now orsend a message.').includes('or send'),
+  },
+  {
+    name: 'sanitize: heating orcooling -> heating or cooling',
+    run: () => sanitizeSection('heating orcooling work').includes('heating or cooling'),
+  },
+
+  // ---- Generic stop-word + capital merge ----
+  {
+    name: 'sanitize: ofMitsubishi -> of Mitsubishi',
+    run: () => sanitizeSection('factory-trained ofMitsubishi units').includes('of Mitsubishi'),
+  },
+  {
+    name: 'sanitize: andTrane -> and Trane',
+    run: () => sanitizeSection('Carrier andTrane equipment').includes('and Trane'),
+  },
+  {
+    name: 'sanitize: must NOT split "orange" or "another"',
+    run: () => {
+      const a = sanitizeSection('the orange unit');
+      const b = sanitizeSection('another visit');
+      return a.includes('orange') && b.includes('another') && !a.includes('or ange');
+    },
+  },
+
+  // ---- Proper noun anchors ----
+  {
+    name: 'sanitize: north jersey -> North Jersey',
+    run: () => sanitizeSection('across north jersey today').includes('North Jersey'),
+  },
+  {
+    name: 'sanitize: new jersey -> New Jersey',
+    run: () => sanitizeSection('throughout new jersey').includes('New Jersey'),
+  },
+
+  // ---- Suspicious-merge warnings on survivors ----
+  {
+    name: 'detectSuspiciousMerges: catches FairLawn survivor',
+    run: () =>
+      detectSuspiciousMerges('serving FairLawn customers').some(
+        (m) => m.token.includes('glued_proper_noun') || m.token === 'FairLawn',
+      ),
+  },
+  {
+    name: 'detectSuspiciousMerges: catches broken email survivor',
+    run: () =>
+      detectSuspiciousMerges('email service@example. com today').some((m) =>
+        m.token.includes('broken_email'),
+      ),
+  },
+  {
+    name: 'detectSuspiciousMerges: catches punctuation-no-space survivor',
+    run: () =>
+      detectSuspiciousMerges('done.Next sentence').some((m) =>
+        m.token.includes('punctuation_no_space'),
+      ),
+  },
+  {
+    name: 'detectSuspiciousMerges: no false positive on clean text',
+    run: () =>
+      detectSuspiciousMerges(
+        'We serve Fair Lawn, NJ — call P&P Mechanical LLC at service@ppmechanicalhvac.com.',
+      ).length === 0,
+  },
+
   // ---- Tokens that must NOT be changed ----
   {
     name: 'preserve 24/7 token',

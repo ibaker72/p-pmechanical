@@ -89,6 +89,8 @@ const PROPER_NOUN_CITIES: Record<string, string> = {
   'fair lawn': 'Fair Lawn',
   'elmwood park': 'Elmwood Park',
   'east orange': 'East Orange',
+  'north jersey': 'North Jersey',
+  'new jersey': 'New Jersey',
 };
 
 // Tokens that must never be re-cased by the city/proper-noun normalizer.
@@ -128,8 +130,21 @@ const KNOWN_BAD_MERGES: Array<[RegExp, string]> = [
   [/\bservicearea\b/gi, 'service area'],
   [/\bserviceareas\b/gi, 'service areas'],
   [/\bemergencyservice\b/gi, 'emergency service'],
-  [/\bcommercialHVAC\b/gi, 'commercial HVAC'],
-  [/\bresidentialHVAC\b/gi, 'residential HVAC'],
+  [/\bcommercialHVAC\b/g, 'commercial HVAC'],
+  [/\bresidentialHVAC\b/g, 'residential HVAC'],
+  // Specific glue cases reported in production output
+  [/\bora\b/g, 'or a'],
+  [/\bofHVAC\b/g, 'of HVAC'],
+  // Use lookahead so cascading glues like "ChooseP&PMechanical" all split:
+  // first this splits Choose|P&P, then the rule below splits P&P|Mechanical.
+  [/([a-z])(?=P&P)/g, '$1 '],
+  [/\bP&P(?=[A-Z])/g, 'P&P '],
+  [/\bmodernmulti\b/gi, 'modern multi'],
+  [/\bareaand\b/gi, 'area and'],
+  [/\bmaintenancecontracts\b/gi, 'maintenance contracts'],
+  [/\bincludingthose\b/gi, 'including those'],
+  [/\borsend\b/gi, 'or send'],
+  [/\borcooling\b/gi, 'or cooling'],
   // Common English glue words
   [/\bhomesand\b/gi, 'homes and'],
   [/\bbusinessesin\b/gi, 'businesses in'],
@@ -137,22 +152,52 @@ const KNOWN_BAD_MERGES: Array<[RegExp, string]> = [
   [/\bschedulean\b/gi, 'schedule an'],
   [/\bscheduleservice\b/gi, 'schedule service'],
   [/\brequestan\b/gi, 'request an'],
-  [/\bnearby\b(\w)/gi, 'nearby $1'],
-  // Proper-noun glue (multi-word cities + state)
+  // Generic stop-word + capitalized-word merge ("ofHVAC", "andTrane", "byMitsubishi").
+  // Lowercased stop word immediately followed by an uppercase letter is almost
+  // never legitimate in well-written English prose — safe to split.
+  [/\b(or|and|of|to|by|in|on|at|for|the|with|from|but|nor|so|yet|an?)([A-Z])/g, '$1 $2'],
+  // Proper-noun glue: multi-word cities glued together
+  [/\bFairLawn\b/g, 'Fair Lawn'],
+  [/\bElmwoodPark\b/g, 'Elmwood Park'],
+  [/\bLittleFalls\b/g, 'Little Falls'],
+  [/\bWoodlandPark\b/g, 'Woodland Park'],
+  [/\bJerseyCity\b/g, 'Jersey City'],
+  [/\bEastOrange\b/g, 'East Orange'],
   [/\bNorthJersey\b/g, 'North Jersey'],
   [/\bNewJersey\b/g, 'New Jersey'],
+  // City-name glue with state abbreviation
   [/\bPatersonNJ\b/g, 'Paterson NJ'],
   [/\bCliftonNJ\b/g, 'Clifton NJ'],
   [/\bPassaicNJ\b/g, 'Passaic NJ'],
 ];
 
 // Patterns we use to DETECT (warn about) potentially-merged tokens that
-// weren't caught by the explicit dictionary above.
+// weren't caught by the explicit dictionary above. These run on text AFTER
+// sanitization — anything they catch is a survivor that should be reviewed.
 const SUSPICIOUS_MERGE_PATTERNS: RegExp[] = [
   // HVAC stuck to a lowercase letter (e.g. "HVACservice")
   /\bHVAC[a-z]/,
   // AC stuck to a lowercase letter (e.g. "ACrepair")
   /\bAC[a-z]/,
+  // Lowercase letter stuck to HVAC, AC, or NJ (e.g. "ofHVAC", "andNJ")
+  /[a-z](?:HVAC|AC|NJ)\b/,
+  // P&P glued to a following word ("ChooseP&P", "P&PMechanical")
+  /[A-Za-z]P&P\b/,
+  /\bP&P[A-Za-z]/,
+];
+
+// Final-pass sanity checks — these complement the merge patterns above and
+// fire on shapes that are nearly always wrong in real prose.
+const POST_SANITIZE_WARNING_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
+  // Period or comma followed directly by an uppercase letter, no space.
+  { pattern: /[.,;:][A-Z]/, label: 'punctuation_no_space' },
+  // Broken email address with a space inside the TLD boundary.
+  { pattern: /@[\w-]+\.\s+[a-z]{2,4}\b/, label: 'broken_email' },
+  // Multi-word NJ city names glued: e.g. FairLawn, EastOrange, JerseyCity.
+  {
+    pattern: /\b(?:Fair|Elmwood|Little|Woodland|Jersey|East|North|New)[A-Z][a-z]+\b/,
+    label: 'glued_proper_noun',
+  },
 ];
 
 // Words that look like merges but are real English — must not warn.
@@ -229,6 +274,10 @@ export function normalizeTextSpacing(text: string): string {
       // but never split "24/7" or numeric units like "07011".
       .replace(/(\d)([A-Za-z])/g, (m, d, l) => (/[/-]/.test(m) ? m : `${d} ${l}`))
       .replace(/\s+/g, (m) => (m.includes('\n') ? '\n' : ' '))
+      // Repair email addresses that the punctuation rule may have broken
+      // ("service@host. com" -> "service@host.com"). Limited to short TLDs so
+      // we don't accidentally glue real sentences back together.
+      .replace(/([\w.+-]+@[\w-]+(?:\.[\w-]+)*)\.\s+([a-z]{2,4})\b/g, '$1.$2')
       .trim()
   );
 }
@@ -256,8 +305,9 @@ export function canonicalizeProperNouns(text: string): string {
     out = out.replace(re, token);
   }
   // Brand name canonicalization. We accept a few common variants but always
-  // emit "P&P Mechanical LLC" — note the ampersand.
-  out = out.replace(/\bP\s*&\s*P\s+Mechanical(\s+LLC)?\b/gi, 'P&P Mechanical LLC');
+  // emit "P&P Mechanical LLC" — note the ampersand. Uses \s* so "P&PMechanical"
+  // (no space between & and Mechanical) is also caught.
+  out = out.replace(/\bP\s*&\s*P\s*Mechanical(\s+LLC)?\b/gi, 'P&P Mechanical LLC');
   out = out.replace(/\bPP\s+Mechanical(\s+LLC)?\b/g, 'P&P Mechanical LLC');
   return out;
 }
@@ -293,7 +343,7 @@ export function detectSuspiciousMerges(text: string): SuspiciousMerge[] {
     let match: RegExpExecArray | null;
     while ((match = re.exec(text)) !== null) {
       // Pull the full word the pattern matched inside.
-      const wordRe = /[A-Za-z]+/g;
+      const wordRe = /[A-Za-z&]+/g;
       wordRe.lastIndex = Math.max(0, match.index);
       const word = wordRe.exec(text)?.[0] ?? '';
       if (!word || seen.has(word)) continue;
@@ -302,6 +352,19 @@ export function detectSuspiciousMerges(text: string): SuspiciousMerge[] {
       const start = Math.max(0, match.index - 20);
       const end = Math.min(text.length, match.index + word.length + 20);
       found.push({ token: word, context: text.slice(start, end).trim() });
+    }
+  }
+
+  for (const { pattern, label } of POST_SANITIZE_WARNING_PATTERNS) {
+    const re = new RegExp(pattern.source, 'g');
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(text)) !== null) {
+      const start = Math.max(0, match.index - 20);
+      const end = Math.min(text.length, match.index + match[0].length + 20);
+      const token = `${label}:${match[0]}`;
+      if (seen.has(token)) continue;
+      seen.add(token);
+      found.push({ token, context: text.slice(start, end).trim() });
     }
   }
   return found;
