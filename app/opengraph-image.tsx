@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { BUSINESS } from '@/lib/constants';
 
-export const runtime = 'edge';
 export const alt = `${BUSINESS.name} — HVAC, Boiler & AC Specialists in Clifton, NJ`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
