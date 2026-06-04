@@ -261,6 +261,14 @@ function StaticLocationView({ slug }: { slug: string }) {
 // static layout (ink/ember/steel, heading-display, Button variants) so the
 // two paths feel consistent.
 // ---------------------------------------------------------------------------
+// Render-level cleanup for stored HTML quirks. The deterministic builder
+// inserts a space before terminal punctuation that follows a closing anchor
+// (so "</a>." never collapses against the link text); this collapses any
+// "</a> ." back to "</a>." for already-saved rows.
+function tidyAnchorPunctuation(html: string): string {
+  return html.replace(/<\/a>\s+([.,;:!?])/g, '</a>$1');
+}
+
 function GeneratedLocationView({ page }: { page: GeoPageRow }) {
   const expansion = findExpansionLocation(page.slug);
   const county = expansion?.county;
@@ -270,8 +278,9 @@ function GeneratedLocationView({ page }: { page: GeoPageRow }) {
   const faqs = Array.isArray(page.faq_json) ? page.faq_json : [];
   // Defensive: older saved rows may still embed a FAQ block in the HTML body.
   // The renderer now lays out FAQ from faq_json as cards, so strip any
-  // legacy FAQ block to avoid double rendering.
-  const bodyHtml = stripFaqBlockFromHtml(page.page_content_html || '');
+  // legacy FAQ block to avoid double rendering. Also tidy stray " ." after
+  // anchor tags coming from the deterministic builder's spacing rules.
+  const bodyHtml = tidyAnchorPunctuation(stripFaqBlockFromHtml(page.page_content_html || ''));
 
   return (
     <>
@@ -327,57 +336,45 @@ function GeneratedLocationView({ page }: { page: GeoPageRow }) {
         </div>
       </section>
 
-      {/* Generated body — wrapped in a polished, max-width-controlled
-          container with bespoke spacing for h2 / p / a. We use Tailwind
-          arbitrary variants instead of @tailwindcss/typography so the styling
-          stays scoped and predictable. */}
+      {/* Generated body — wrapped in a polished dark card so the article
+          reads as an intentional landing-page section, not loose page text.
+          Typography rules live in .prose-location (see globals.css) so each
+          h2/p/a gets predictable styling without runtime class concatenation.
+          The article width caps around 920px for comfortable line length. */}
       <section className="py-16 sm:py-24">
         <div className="container-wide">
-          <article
-            className={
-              'mx-auto max-w-[920px] ' +
-              // Headings
-              '[&_h2]:scroll-mt-28 [&_h2]:font-display [&_h2]:font-bold [&_h2]:text-white' +
-              '[&_h2]:text-3xl sm:[&_h2]:text-4xl' +
-              '[&_h2]:mb-6 [&_h2]:mt-14 sm:[&_h2]:mt-16' +
-              '[&_h2]:border-b [&_h2]:border-ember-500/30 [&_h2]:pb-4' +
-              '[&_h2:first-child]:mt-0' +
-              // Paragraphs
-              '[&_p]:text-[17px] [&_p]:leading-[1.75] [&_p]:text-steel-100 sm:[&_p]:text-lg' +
-              '[&_p]:my-5' +
-              // Links
-              '[&_a]:font-semibold [&_a]:text-ember-300 [&_a]:underline [&_a]:underline-offset-4' +
-              '[&_a]:decoration-ember-500/40 hover:[&_a]:text-ember-200 hover:[&_a]:decoration-ember-300' +
-              '[&_a]:transition-colors'
-            }
-            dangerouslySetInnerHTML={{ __html: bodyHtml }}
-          />
+          <div className="mx-auto max-w-[980px] rounded-3xl border border-white/10 bg-ink-900/40 px-6 py-10 shadow-[0_30px_80px_-40px_rgba(0,0,0,0.7)] backdrop-blur-sm sm:px-10 sm:py-12 lg:px-14 lg:py-14">
+            <article
+              className="prose-location mx-auto max-w-[920px]"
+              dangerouslySetInnerHTML={{ __html: bodyHtml }}
+            />
+          </div>
         </div>
       </section>
 
       {/* FAQ — rendered as styled cards from faq_json (NOT from the HTML
           body) so each item gets a real container, hover state, and proper
-          typography. */}
+          typography. Heading uses scroll-mt-32 to clear the fixed navbar. */}
       {faqs.length > 0 && (
-        <section className="border-t border-white/10 bg-ink-900/40 py-16 sm:py-20">
+        <section className="border-t border-white/10 bg-ink-900/40 py-20 sm:py-28">
           <div className="container-wide">
-            <div className="mx-auto max-w-[920px]">
-              <div className="mb-10">
+            <div className="mx-auto max-w-[980px]">
+              <div className="mb-12">
                 <span className="eyebrow mb-3">Common questions</span>
-                <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
+                <h2 className="scroll-mt-32 font-display text-3xl font-bold leading-tight text-white sm:text-4xl">
                   Frequently asked questions about HVAC in {page.city}
                 </h2>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {faqs.map((faq, i) => (
                   <div
                     key={i}
-                    className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-colors hover:border-ember-400/40 sm:p-8"
+                    className="group rounded-2xl border border-white/10 bg-white/[0.03] p-7 transition-colors hover:border-ember-400/50 sm:p-9"
                   >
-                    <h3 className="font-display text-xl font-bold leading-snug text-white sm:text-2xl">
+                    <h3 className="font-display text-xl font-bold leading-snug text-white transition-colors group-hover:text-ember-200 sm:text-2xl">
                       {faq.question}
                     </h3>
-                    <p className="mt-3 text-[17px] leading-[1.75] text-steel-200 sm:text-lg">
+                    <p className="mt-4 text-[17px] leading-[1.8] text-steel-200 sm:text-[18px]">
                       {faq.answer}
                     </p>
                   </div>

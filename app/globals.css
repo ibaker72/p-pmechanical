@@ -177,6 +177,50 @@
   @apply rounded bg-ink-800 px-1.5 py-0.5 text-sm text-ember-200;
 }
 
+/* Prose for AI-generated location landing pages.
+   Tighter visual rules than .prose-pp — H2s read as section headers with an
+   ember left-edge accent, paragraphs use landing-page leading, and links pick
+   up the ember palette. scroll-mt-32 keeps each h2 clear of the 80px sticky
+   navbar when anchored. */
+.prose-location {
+  @apply text-steel-100;
+}
+.prose-location > :first-child {
+  @apply mt-0;
+}
+.prose-location h2 {
+  @apply relative mb-6 scroll-mt-32 border-l-[3px] border-l-ember-500 pl-4 font-display text-[28px] font-bold leading-tight tracking-tight text-white sm:pl-5 sm:text-[34px];
+}
+.prose-location h2:not(:first-child) {
+  @apply mt-20 sm:mt-24;
+}
+.prose-location h2:not(:first-child)::before {
+  content: '';
+  @apply absolute -top-10 left-0 right-0 h-px bg-white/10 sm:-top-12;
+}
+.prose-location h3 {
+  @apply mb-3 mt-10 scroll-mt-32 font-display text-2xl font-bold text-white;
+}
+.prose-location p {
+  @apply my-5 text-[17px] leading-[1.8] text-steel-100 sm:text-[18px];
+}
+.prose-location ul,
+.prose-location ol {
+  @apply my-5 ml-6 space-y-2 text-[17px] leading-[1.8] text-steel-100 sm:text-[18px];
+}
+.prose-location ul {
+  @apply list-disc;
+}
+.prose-location ol {
+  @apply list-decimal;
+}
+.prose-location a {
+  @apply font-semibold text-ember-300 underline decoration-ember-500/40 underline-offset-4 transition-colors hover:text-ember-200 hover:decoration-ember-300;
+}
+.prose-location strong {
+  @apply text-white;
+}
+
 /* Honor user motion preferences: disable decorative/entrance animations and
    ensure all reveal content is fully visible without motion. */
 @media (prefers-reduced-motion: reduce) {
