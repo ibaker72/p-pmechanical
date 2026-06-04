@@ -12,6 +12,7 @@ import {
   type GeoPageRow,
 } from '@/lib/geo/repository';
 import { findExpansionLocation } from '@/lib/geo/locations';
+import { stripFaqBlockFromHtml } from '@/lib/geo/build-location-html';
 
 // Allow ISR-style rendering for AI-generated cities not in the static list.
 export const dynamicParams = true;
@@ -267,7 +268,10 @@ function GeneratedLocationView({ page }: { page: GeoPageRow }) {
   const heading = page.h1 || `HVAC Services in ${cityState}`;
   const intro = page.intro_copy || '';
   const faqs = Array.isArray(page.faq_json) ? page.faq_json : [];
-  const html = page.page_content_html || '';
+  // Defensive: older saved rows may still embed a FAQ block in the HTML body.
+  // The renderer now lays out FAQ from faq_json as cards, so strip any
+  // legacy FAQ block to avoid double rendering.
+  const bodyHtml = stripFaqBlockFromHtml(page.page_content_html || '');
 
   return (
     <>
@@ -323,18 +327,69 @@ function GeneratedLocationView({ page }: { page: GeoPageRow }) {
         </div>
       </section>
 
-      {/* Generated body */}
-      <section className="py-20 sm:py-24">
-        <div className="container-tight">
+      {/* Generated body — wrapped in a polished, max-width-controlled
+          container with bespoke spacing for h2 / p / a. We use Tailwind
+          arbitrary variants instead of @tailwindcss/typography so the styling
+          stays scoped and predictable. */}
+      <section className="py-16 sm:py-24">
+        <div className="container-wide">
           <article
-            className="prose prose-invert prose-headings:font-display prose-headings:text-white prose-h2:heading-section prose-h2:mt-12 prose-h3:font-display prose-h3:text-xl prose-h3:text-white prose-p:text-steel-100 prose-a:text-ember-300 hover:prose-a:text-ember-200 prose-a:font-bold max-w-none"
-            dangerouslySetInnerHTML={{ __html: html }}
+            className={
+              'mx-auto max-w-[920px] ' +
+              // Headings
+              '[&_h2]:scroll-mt-28 [&_h2]:font-display [&_h2]:font-bold [&_h2]:text-white' +
+              '[&_h2]:text-3xl sm:[&_h2]:text-4xl' +
+              '[&_h2]:mb-6 [&_h2]:mt-14 sm:[&_h2]:mt-16' +
+              '[&_h2]:border-b [&_h2]:border-ember-500/30 [&_h2]:pb-4' +
+              '[&_h2:first-child]:mt-0' +
+              // Paragraphs
+              '[&_p]:text-[17px] [&_p]:leading-[1.75] [&_p]:text-steel-100 sm:[&_p]:text-lg' +
+              '[&_p]:my-5' +
+              // Links
+              '[&_a]:font-semibold [&_a]:text-ember-300 [&_a]:underline [&_a]:underline-offset-4' +
+              '[&_a]:decoration-ember-500/40 hover:[&_a]:text-ember-200 hover:[&_a]:decoration-ember-300' +
+              '[&_a]:transition-colors'
+            }
+            dangerouslySetInnerHTML={{ __html: bodyHtml }}
           />
         </div>
       </section>
 
+      {/* FAQ — rendered as styled cards from faq_json (NOT from the HTML
+          body) so each item gets a real container, hover state, and proper
+          typography. */}
+      {faqs.length > 0 && (
+        <section className="border-t border-white/10 bg-ink-900/40 py-16 sm:py-20">
+          <div className="container-wide">
+            <div className="mx-auto max-w-[920px]">
+              <div className="mb-10">
+                <span className="eyebrow mb-3">Common questions</span>
+                <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
+                  Frequently asked questions about HVAC in {page.city}
+                </h2>
+              </div>
+              <div className="space-y-4">
+                {faqs.map((faq, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-colors hover:border-ember-400/40 sm:p-8"
+                  >
+                    <h3 className="font-display text-xl font-bold leading-snug text-white sm:text-2xl">
+                      {faq.question}
+                    </h3>
+                    <p className="mt-3 text-[17px] leading-[1.75] text-steel-200 sm:text-lg">
+                      {faq.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Services overview link */}
-      <section className="border-y border-white/10 bg-ink-900/40 py-16">
+      <section className="border-t border-white/10 bg-ink-900/40 py-16">
         <div className="container-wide">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="max-w-2xl">

@@ -1,9 +1,11 @@
 // Deterministic HTML builder for AI-generated service-area pages.
 //
 // The model returns plain-text sections (see lib/geo/prompt.ts). This module
-// assembles the final HTML body — headings, paragraphs, internal links,
-// and the FAQ block. Spacing around anchor tags is hardcoded so the output
-// never produces "can<a" or "</a>today" issues.
+// assembles the body — headings, paragraphs, internal links. The FAQ block
+// is intentionally NOT included in the HTML body anymore: the page renderer
+// reads structured FAQ entries from faq_json and lays them out as React
+// cards. Spacing around anchor tags is hardcoded so the output never
+// produces "can<a" or "</a>today" issues.
 //
 // NOTE: deliberately has no @/ imports so the test harness can run under
 // node --experimental-strip-types without a bundler. Business name is passed
@@ -56,15 +58,19 @@ export function extractFaqs(sections: GeneratedSections): FaqEntry[] {
   return out;
 }
 
-function buildFaqHtml(faqs: FaqEntry[]): string {
-  if (!faqs.length) return '';
-  const items = faqs
-    .map(
-      (f) =>
-        `<div class="faq-item"><h3>${escapeHtml(f.question)}</h3><p>${escapeHtml(f.answer)}</p></div>`,
+/**
+ * Remove any FAQ block that older builder output may have embedded in the
+ * HTML body. Safe to call on freshly-built HTML (the new builder doesn't emit
+ * a FAQ block, so this is a no-op there).
+ */
+export function stripFaqBlockFromHtml(html: string): string {
+  return html
+    .replace(
+      /<h2>\s*Frequently Asked Questions\s*<\/h2>\s*<div class="faq-list">[\s\S]*?<\/div>\s*/i,
+      '',
     )
-    .join('\n');
-  return `${h2('Frequently Asked Questions')}\n<div class="faq-list">\n${items}\n</div>`;
+    .replace(/<h2>\s*Frequently Asked Questions\s*<\/h2>\s*/i, '')
+    .trim();
 }
 
 export function buildLocationPageHtml(
@@ -101,8 +107,9 @@ export function buildLocationPageHtml(
     p(sections.service_area_paragraph),
   ].join('\n');
 
+  // FAQ is intentionally omitted from the HTML body. The renderer reads
+  // FAQ entries from the faq_json column and lays them out as styled cards.
   const faqs = extractFaqs(sections);
-  const faqBlock = buildFaqHtml(faqs);
 
   const html = [
     introBlock,
@@ -111,7 +118,6 @@ export function buildLocationPageHtml(
     estimateBlock,
     whyBlock,
     serviceAreaBlock,
-    faqBlock,
   ]
     .filter(Boolean)
     .join('\n\n');
