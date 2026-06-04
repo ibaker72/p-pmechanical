@@ -60,6 +60,27 @@ export const envSchema = z.object({
   OPENCLAW_INTERNAL_SECRET: nonEmpty
     .optional()
     .describe('If set, OpenClaw routes require a matching x-internal-secret header'),
+
+  // Anthropic (direct Claude API for AI SEO page generation). Server-only.
+  ANTHROPIC_API_KEY: nonEmpty
+    .optional()
+    .describe('Anthropic Claude API key — server only, never public'),
+  ANTHROPIC_MODEL: nonEmpty.optional().describe('Override model id, default claude-sonnet-4-6'),
+  ANTHROPIC_API_BASE_URL: url
+    .optional()
+    .describe('Override Anthropic API base URL, default https://api.anthropic.com/v1'),
+  ANTHROPIC_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('Request timeout for Anthropic calls (ms), default 30000'),
+
+  // Cron / internal protection. Used by /api/generate-city-page and
+  // /api/cron/refresh-geo-pages. Required to call those routes at all.
+  CRON_SECRET: nonEmpty
+    .optional()
+    .describe('Shared secret for x-cron-secret header and Authorization: Bearer on cron routes'),
 });
 
 export type Env = z.infer<typeof envSchema>;

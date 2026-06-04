@@ -5,37 +5,91 @@ import { MapPin, Phone, Building, ArrowRight } from 'lucide-react';
 import { LOCATIONS, RESIDENTIAL_SERVICES, BUSINESS } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { InlineLeadForm } from '@/components/forms/InlineLeadForm';
-import { LocalBusinessSchema, BreadcrumbSchema } from '@/components/seo/JsonLd';
+import { LocalBusinessSchema, BreadcrumbSchema, FaqSchema } from '@/components/seo/JsonLd';
+import {
+  getPublishedGeoPageBySlug,
+  listPublishedGeoPages,
+  type GeoPageRow,
+} from '@/lib/geo/repository';
+import { findExpansionLocation } from '@/lib/geo/locations';
 
-export function generateStaticParams() {
-  return LOCATIONS.map((l) => ({ slug: l.slug }));
+// Allow ISR-style rendering for AI-generated cities not in the static list.
+export const dynamicParams = true;
+// Re-fetch DB-backed pages periodically without a redeploy.
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const staticSlugs = LOCATIONS.map((l) => ({ slug: l.slug }));
+  const staticSet = new Set(LOCATIONS.map((l) => l.slug));
+  const published = await listPublishedGeoPages();
+  const aiSlugs = published.filter((p) => !staticSet.has(p.slug)).map((p) => ({ slug: p.slug }));
+  return [...staticSlugs, ...aiSlugs];
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const l = LOCATIONS.find((x) => x.slug === params.slug);
-  if (!l) return {};
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const staticLocation = LOCATIONS.find((x) => x.slug === params.slug);
+  if (staticLocation) {
+    return {
+      title: `HVAC Services in ${staticLocation.name}, NJ`,
+      description:
+        `Licensed HVAC, boiler, and AC service in ${staticLocation.name}, NJ from P&P Mechanical. 24/7 emergency dispatch, free estimates, and same-day appointments across ${staticLocation.county}.`.slice(
+          0,
+          158,
+        ),
+      alternates: { canonical: `/locations/${staticLocation.slug}` },
+      openGraph: {
+        title: `HVAC Services in ${staticLocation.name}, NJ | ${BUSINESS.name}`,
+        description: `Full-service HVAC for ${staticLocation.name} homeowners — installs, repairs, and 24/7 emergency.`,
+        url: `/locations/${staticLocation.slug}`,
+      },
+    };
+  }
+
+  const dbPage = await getPublishedGeoPageBySlug(params.slug);
+  if (!dbPage) return {};
+  const title = dbPage.title || `HVAC Services in ${dbPage.city}, ${dbPage.state}`;
+  const description =
+    dbPage.meta_description ||
+    `HVAC service in ${dbPage.city}, ${dbPage.state} from ${BUSINESS.name}.`;
   return {
-    title: `HVAC Services in ${l.name}, NJ`,
-    description:
-      `Licensed HVAC, boiler, and AC service in ${l.name}, NJ from P&P Mechanical. 24/7 emergency dispatch, free estimates, and same-day appointments across ${l.county}.`.slice(
-        0,
-        158,
-      ),
-    alternates: { canonical: `/locations/${l.slug}` },
+    title,
+    description: description.slice(0, 158),
+    alternates: { canonical: `/locations/${dbPage.slug}` },
     openGraph: {
-      title: `HVAC Services in ${l.name}, NJ | ${BUSINESS.name}`,
-      description: `Full-service HVAC for ${l.name} homeowners — installs, repairs, and 24/7 emergency.`,
-      url: `/locations/${l.slug}`,
+      title: `${title} | ${BUSINESS.name}`,
+      description: description.slice(0, 158),
+      url: `/locations/${dbPage.slug}`,
     },
   };
 }
 
-export default function LocationPage({ params }: { params: { slug: string } }) {
-  const location = LOCATIONS.find((l) => l.slug === params.slug);
-  if (!location) notFound();
+export default async function LocationPage({ params }: { params: { slug: string } }) {
+  // Priority 1: hardcoded static city — render existing rich layout unchanged.
+  const staticLocation = LOCATIONS.find((l) => l.slug === params.slug);
+  if (staticLocation) {
+    return <StaticLocationView slug={params.slug} />;
+  }
 
+  // Priority 2: AI-generated DB-backed page.
+  const dbPage = await getPublishedGeoPageBySlug(params.slug);
+  if (dbPage) {
+    return <GeneratedLocationView page={dbPage} />;
+  }
+
+  notFound();
+}
+
+// ---------------------------------------------------------------------------
+// Static render path — IDENTICAL to the original page logic. Do not change.
+// ---------------------------------------------------------------------------
+function StaticLocationView({ slug }: { slug: string }) {
+  const location = LOCATIONS.find((l) => l.slug === slug)!;
   const nearby = location.nearby
-    .map((slug) => LOCATIONS.find((l) => l.slug === slug))
+    .map((s) => LOCATIONS.find((l) => l.slug === s))
     .filter(Boolean) as typeof LOCATIONS;
 
   return (
@@ -194,6 +248,130 @@ export default function LocationPage({ params }: { params: { slug: string } }) {
                 <span className="font-display text-lg text-white">{n.name}, NJ</span>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// AI-generated DB-backed render path. Uses the same style tokens as the
+// static layout (ink/ember/steel, heading-display, Button variants) so the
+// two paths feel consistent.
+// ---------------------------------------------------------------------------
+function GeneratedLocationView({ page }: { page: GeoPageRow }) {
+  const expansion = findExpansionLocation(page.slug);
+  const county = expansion?.county;
+  const cityState = `${page.city}, ${page.state}`;
+  const heading = page.h1 || `HVAC Services in ${cityState}`;
+  const intro = page.intro_copy || '';
+  const faqs = Array.isArray(page.faq_json) ? page.faq_json : [];
+  const html = page.page_content_html || '';
+
+  return (
+    <>
+      <LocalBusinessSchema city={page.city} />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Service Areas', href: '/locations' },
+          { name: page.city, href: `/locations/${page.slug}` },
+        ]}
+      />
+      {faqs.length > 0 && <FaqSchema faqs={faqs.map((f) => ({ q: f.question, a: f.answer }))} />}
+
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-white/10 py-20 sm:py-28">
+        <div aria-hidden className="absolute inset-0 bg-hero-noise opacity-90" />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-grid-faint bg-[length:64px_64px] opacity-20"
+        />
+        <div className="container-wide relative">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-6 text-xs uppercase tracking-widest text-steel-300"
+          >
+            <Link href="/" className="hover:text-ember-300">
+              Home
+            </Link>
+            <span className="px-2">/</span>
+            <Link href="/locations" className="hover:text-ember-300">
+              Service Areas
+            </Link>
+            <span className="px-2">/</span>
+            <span className="text-white">{cityState}</span>
+          </nav>
+          {county && (
+            <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-ember-300">
+              <MapPin className="h-4 w-4" /> {county}
+            </div>
+          )}
+          <h1 className="heading-display mt-3 text-balance">{heading}</h1>
+          {intro && <p className="mt-6 max-w-3xl text-lg text-steel-100">{intro}</p>}
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button asChild size="lg" variant="primary">
+              <Link href="/quote">Get a Free Quote</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <a href={BUSINESS.phoneHref}>
+                <Phone className="h-4 w-4" /> {BUSINESS.phone}
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Generated body */}
+      <section className="py-20 sm:py-24">
+        <div className="container-tight">
+          <article
+            className="prose prose-invert prose-headings:font-display prose-headings:text-white prose-h2:heading-section prose-h2:mt-12 prose-h3:font-display prose-h3:text-xl prose-h3:text-white prose-p:text-steel-100 prose-a:text-ember-300 hover:prose-a:text-ember-200 prose-a:font-bold max-w-none"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        </div>
+      </section>
+
+      {/* Services overview link */}
+      <section className="border-y border-white/10 bg-ink-900/40 py-16">
+        <div className="container-wide">
+          <div className="flex flex-wrap items-center justify-between gap-6">
+            <div className="max-w-2xl">
+              <span className="eyebrow mb-3">Explore services</span>
+              <h2 className="font-display text-3xl text-white">
+                Residential and commercial HVAC across North Jersey.
+              </h2>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild variant="outline">
+                <Link href="/services">View Services</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/commercial">Commercial HVAC</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Inline lead form */}
+      <section className="py-20 sm:py-24">
+        <div className="container-tight">
+          <div className="mb-10 max-w-2xl">
+            <span className="eyebrow mb-4">Request Service</span>
+            <h2 className="heading-section text-balance">Get a free quote in {page.city}.</h2>
+            <p className="mt-4 text-steel-200">
+              Tell us what you need — we&apos;ll follow up to confirm timing. For urgent service,
+              call{' '}
+              <a href={BUSINESS.phoneHref} className="font-bold text-ember-300 underline">
+                {BUSINESS.phone}
+              </a>
+              .
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-10">
+            <InlineLeadForm city={page.city} source="location_page" />
           </div>
         </div>
       </section>

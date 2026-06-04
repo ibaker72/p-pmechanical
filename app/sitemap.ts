@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next';
 import { RESIDENTIAL_SERVICES, COMMERCIAL_SERVICES, LOCATIONS } from '@/lib/constants';
 import { getAllPosts } from '@/lib/blog';
+import { listPublishedGeoPages } from '@/lib/geo/repository';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalllc.com';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const staticPages = [
     '',
@@ -46,6 +47,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }));
 
+  // AI-generated expansion city pages. If Supabase isn't configured at build
+  // time, this returns []. Static city slugs are filtered out so they can't
+  // appear twice.
+  const staticSlugs = new Set(LOCATIONS.map((l) => l.slug));
+  const generatedPages = (await listPublishedGeoPages())
+    .filter((p) => !staticSlugs.has(p.slug))
+    .map((p) => ({
+      url: `${SITE_URL}/locations/${p.slug}`,
+      lastModified: new Date(p.updated_at),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    }));
+
   const blogPages = getAllPosts().map((p) => ({
     url: `${SITE_URL}/blog/${p.slug}`,
     lastModified: new Date(p.date),
@@ -58,6 +72,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...servicePages,
     ...commercialServicePages,
     ...locationPages,
+    ...generatedPages,
     ...blogPages,
   ];
 }
