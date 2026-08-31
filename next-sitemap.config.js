@@ -5,8 +5,12 @@ module.exports = {
   sitemapSize: 5000,
   changefreq: 'weekly',
   priority: 0.7,
-  exclude: ['/api/*', '/thank-you'],
+  exclude: ['/api/*', '/admin', '/admin/*', '/thank-you'],
   robotsTxtOptions: {
-    policies: [{ userAgent: '*', allow: '/' }],
+    policies: [
+      // /admin is the authenticated commercial estimating system and must
+      // never be crawled or indexed.
+      { userAgent: '*', allow: '/', disallow: ['/api/', '/admin', '/admin/'] },
+    ],
   },
 };

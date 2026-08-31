@@ -23,7 +23,26 @@ export const envSchema = z.object({
   OWNER_EMAIL: z.string().email().optional().describe('Where new-lead notifications are sent'),
 
   // Admin
-  ADMIN_SECRET: nonEmpty.optional().describe('Bearer token protecting /api/leads/list'),
+  // Doubles as the sign-in password for the /admin estimating system, so it
+  // must be at least 16 characters for admin sessions to be enabled.
+  ADMIN_SECRET: nonEmpty
+    .optional()
+    .describe('Bearer token for /api/leads/list AND the /admin sign-in password (min 16 chars)'),
+  ADMIN_SESSION_SECRET: nonEmpty
+    .optional()
+    .describe('Optional dedicated HMAC key for admin session cookies. Defaults to ADMIN_SECRET.'),
+  ADMIN_EMAIL: z
+    .string()
+    .email()
+    .optional()
+    .describe(
+      'Label recorded in created_by/updated_by on estimating records. Defaults to "owner".',
+    ),
+
+  // Commercial estimating system
+  SUPABASE_DOCUMENTS_BUCKET: nonEmpty
+    .optional()
+    .describe('Private Supabase Storage bucket for bid documents. Defaults to project-documents.'),
 
   // Anti-abuse / rate limiting (Upstash Redis)
   UPSTASH_REDIS_REST_URL: url

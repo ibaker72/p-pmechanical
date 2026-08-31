@@ -4,7 +4,13 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://ppmechanicalllc.co
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: '*', allow: '/', disallow: ['/api/', '/thank-you'] }],
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/', // /admin is the authenticated commercial estimating system.
+        disallow: ['/api/', '/admin', '/admin/', '/thank-you'],
+      },
+    ],
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
   };

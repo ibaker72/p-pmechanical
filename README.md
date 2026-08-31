@@ -28,22 +28,25 @@ The site runs at <http://localhost:3000>.
 
 ## Environment variables
 
-| Variable                             | Required                    | Description                                                                                  |
-| ------------------------------------ | --------------------------- | -------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL`               | yes                         | Full URL (e.g. `https://ppmechanicalhvac.com`) — used by metadata, sitemap, structured data. |
-| `SUPABASE_URL`                       | yes (for leads)             | Supabase project URL                                                                         |
-| `SUPABASE_ANON_KEY`                  | optional                    | (Not used server-side; included for any future client-side reads)                            |
-| `SUPABASE_SERVICE_ROLE_KEY`          | yes (for leads)             | Server-only key — never expose to client. Used by `/api/leads` to insert.                    |
-| `RESEND_API_KEY`                     | yes (for emails)            | Resend API key for transactional email                                                       |
-| `OWNER_EMAIL`                        | yes (for emails)            | Where new-lead notifications are sent                                                        |
-| `ADMIN_SECRET`                       | yes (for `/api/leads/list`) | Bearer token to protect the leads list endpoint                                              |
-| `UPSTASH_REDIS_REST_URL`             | yes in prod                 | Upstash Redis REST URL — backs rate limiting and idempotency on `/api/leads*`.               |
-| `UPSTASH_REDIS_REST_TOKEN`           | yes in prod                 | Upstash Redis REST token.                                                                    |
-| `WEBHOOK_SECRET`                     | optional                    | If set, `/api/leads/webhook` requires `X-Webhook-Secret` to match.                           |
-| `OUTBOUND_WEBHOOK_URL`               | optional                    | Where to POST `lead.created` events (e.g. OpenClaw, n8n, Make, Zapier).                      |
-| `OUTBOUND_WEBHOOK_SECRET`            | optional                    | HMAC-SHA256 key used to sign the outbound event payload (in `X-Signature`).                  |
-| `NEXT_PUBLIC_BUSINESS_PHONE`         | optional                    | Overrides the placeholder phone if needed in client code                                     |
-| `NEXT_PUBLIC_BUSINESS_PHONE_DISPLAY` | optional                    | Pretty-formatted display phone                                                               |
+| Variable                             | Required                                 | Description                                                                                                                                                  |
+| ------------------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `NEXT_PUBLIC_SITE_URL`               | yes                                      | Full URL (e.g. `https://ppmechanicalhvac.com`) — used by metadata, sitemap, structured data.                                                                 |
+| `SUPABASE_URL`                       | yes (for leads)                          | Supabase project URL                                                                                                                                         |
+| `SUPABASE_ANON_KEY`                  | optional                                 | (Not used server-side; included for any future client-side reads)                                                                                            |
+| `SUPABASE_SERVICE_ROLE_KEY`          | yes (for leads)                          | Server-only key — never expose to client. Used by `/api/leads` to insert.                                                                                    |
+| `RESEND_API_KEY`                     | yes (for emails)                         | Resend API key for transactional email                                                                                                                       |
+| `OWNER_EMAIL`                        | yes (for emails)                         | Where new-lead notifications are sent                                                                                                                        |
+| `ADMIN_SECRET`                       | yes (for `/api/leads/list` and `/admin`) | Bearer token for the leads list endpoint **and** the sign-in password for the `/admin` estimating system. Must be ≥ 16 characters for admin sign-in to work. |
+| `ADMIN_SESSION_SECRET`               | optional                                 | Dedicated HMAC key for admin session cookies, so the sign-in password and the signing key can rotate independently. Defaults to `ADMIN_SECRET`.              |
+| `ADMIN_EMAIL`                        | optional                                 | Recorded in `created_by` / `updated_by` on estimating records. Defaults to `owner`.                                                                          |
+| `SUPABASE_DOCUMENTS_BUCKET`          | optional                                 | Private Supabase Storage bucket for bid documents. Defaults to `project-documents`.                                                                          |
+| `UPSTASH_REDIS_REST_URL`             | yes in prod                              | Upstash Redis REST URL — backs rate limiting and idempotency on `/api/leads*`.                                                                               |
+| `UPSTASH_REDIS_REST_TOKEN`           | yes in prod                              | Upstash Redis REST token.                                                                                                                                    |
+| `WEBHOOK_SECRET`                     | optional                                 | If set, `/api/leads/webhook` requires `X-Webhook-Secret` to match.                                                                                           |
+| `OUTBOUND_WEBHOOK_URL`               | optional                                 | Where to POST `lead.created` events (e.g. OpenClaw, n8n, Make, Zapier).                                                                                      |
+| `OUTBOUND_WEBHOOK_SECRET`            | optional                                 | HMAC-SHA256 key used to sign the outbound event payload (in `X-Signature`).                                                                                  |
+| `NEXT_PUBLIC_BUSINESS_PHONE`         | optional                                 | Overrides the placeholder phone if needed in client code                                                                                                     |
+| `NEXT_PUBLIC_BUSINESS_PHONE_DISPLAY` | optional                                 | Pretty-formatted display phone                                                                                                                               |
 
 The site degrades gracefully — if Supabase, Resend, or Upstash env vars are missing, the form will still respond successfully and the API endpoint will return a `warnings` array. Configure properly before launch. The schema is enforced by `npm run validate:env` (auto-run in `prebuild`).
 
@@ -133,6 +136,85 @@ Response shape:
 
 ---
 
+## Commercial estimating system (`/admin`)
+
+An authenticated, internal system for estimating commercial mechanical work:
+projects → estimates → takeoff → pricing → proposal → job budget. It lives
+inside this application; it is not a second app.
+
+### Signing in
+
+`/admin` is protected by `middleware.ts` **and** by a `requireAdmin()` check in
+the admin layout. Sign in at `/admin/login` with the value of `ADMIN_SECRET`.
+A successful sign-in sets an HMAC-SHA256-signed, HttpOnly, SameSite=Lax session
+cookie that expires after 12 hours. Sign-in attempts are rate limited through
+the same Upstash limiter the public forms use.
+
+This deliberately reuses the application's existing authorization primitive
+rather than introducing a competing identity system. There is one owner
+account.
+
+### What it does
+
+| Area         | Route                                                                                                                                     | Notes                                                                                                           |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Dashboard    | `/admin`                                                                                                                                  | Pipeline value, bids due, recently updated estimates.                                                           |
+| Projects     | `/admin/projects`                                                                                                                         | Customer, site, schedule and commercial conditions (prevailing wage, tax exempt, occupied building…).           |
+| Estimates    | `/admin/estimates/[id]/…`                                                                                                                 | Ten tabs: overview, scope, takeoff, materials, labor, equipment, subcontractors, pricing, bid review, proposal. |
+| Assemblies   | `/admin/assemblies`                                                                                                                       | Reusable installed-work templates that explode into priced takeoff lines.                                       |
+| Cost library | `/admin/materials`, `/admin/labor-rates`, `/admin/labor-modifiers`, `/admin/equipment-rates`, `/admin/vendors`, `/admin/scope-categories` | All editable in the admin; nothing is hardcoded.                                                                |
+| Jobs         | `/admin/jobs`                                                                                                                             | Awarded estimate converted to a job with an immutable budget snapshot.                                          |
+
+### The rules the system is built on
+
+- **Historical integrity.** Adding a material or an assembly to an estimate
+  _copies_ its price and productivity values onto the takeoff line. Editing the
+  price book afterwards never moves a bid that was already built. Revisions are
+  cloned, never overwritten.
+- **The server owns the numbers.** Every total is recomputed server-side by
+  `lib/estimating/calc.ts` after each mutation. A client-supplied total is never
+  trusted or stored.
+- **Decimal-safe money.** `lib/estimating/decimal.ts` is fixed-point arithmetic
+  on `bigint`, not floats. Rounding is half-up away from zero, matching what an
+  estimator sees in a spreadsheet.
+- **Markup is not margin.** $100,000 of cost at a 20% target gross margin sells
+  for **$125,000** (`cost ÷ (1 − margin)`), not $120,000. Both figures are shown
+  side by side on the pricing tab.
+- **The math is visible.** Labor productivity modifiers are shown step by step
+  (1,400 base hours × 1.15 × 1.10 = 1,771), never collapsed into one number.
+- **Nothing internal reaches the customer.** The proposal page reads no cost,
+  rate, markup, margin, profit or internal-note field. The only figure that
+  crosses is the total proposed amount, plus alternate and allowance amounts the
+  estimator explicitly entered for the proposal.
+
+### Commands
+
+```bash
+npm run test              # calculation engine + auth + geo sanitizer
+npm run test:estimating   # 74 calculation-engine tests
+npm run test:auth         # 26 session/authorization tests
+npm run test:estimating-db  # DB + RLS integration tests (skips without Supabase env)
+npm run seed:estimating -- --confirm   # clearly-fictional demo cost library (dev only)
+npm run seed:estimating -- --confirm --remove
+```
+
+### Deliberately not built yet
+
+These have database schema and clear extension points but **no implementation
+and no UI that pretends otherwise**:
+
+- **AI plan/spec extraction.** `document_extractions` and
+  `document_extraction_findings` exist, with `review_status` defaulting to
+  `pending` so a future extraction can never add a billable item on its own.
+  No AI is wired up and no button claims it is.
+- **Actual vs estimate.** `job_cost_entries.source_takeoff_item_id` traces an
+  actual cost back to the estimate line that budgeted it. Nothing writes to it
+  yet.
+- **CSV price-book import.** The material model and actions are structured for
+  it; the importer itself is not built.
+
+---
+
 ## File tree
 
 ```
@@ -160,12 +242,35 @@ app/
 │       ├── route.ts         # POST — primary lead endpoint
 │       ├── webhook/route.ts # Alias for external CRMs
 │       └── list/route.ts    # GET — admin (protected by ADMIN_SECRET)
+├── admin/                   # Authenticated commercial estimating system
+│   ├── layout.tsx           # requireAdmin() + sidebar shell
+│   ├── page.tsx             # Dashboard
+│   ├── login/               # Sign in (ADMIN_SECRET) + session actions
+│   ├── projects/            # List, new, detail, edit
+│   ├── estimates/
+│   │   ├── page.tsx         # All estimates
+│   │   ├── new/
+│   │   └── [estimateId]/    # overview · scope · takeoff · materials · labor
+│   │                        # equipment · subcontractors · pricing · checklist · proposal
+│   ├── assemblies/          # Reusable installed-work templates
+│   ├── materials/           # Material price book (search, filter, paginate)
+│   ├── labor-rates/         # Burdened classifications
+│   ├── labor-modifiers/     # Productivity factors
+│   ├── equipment-rates/     # Rental / owned equipment
+│   ├── vendors/             # Suppliers & subcontractors
+│   ├── scope-categories/    # Configurable scope taxonomy
+│   └── jobs/                # Awarded estimate → job budget
 ├── sitemap.ts               # Auto-generated sitemap
 ├── robots.ts                # Auto-generated robots
 ├── not-found.tsx
 └── layout.tsx               # Root layout + fonts
 
+middleware.ts                # Edge guard for /admin/*
+
 components/
+├── admin/                   # Estimating UI: shell, tables, forms, action plumbing
+│   ├── takeoff/             # Takeoff grid, row actions, add-line forms
+│   └── catalog/             # Price book, labor, equipment, vendor, assembly forms
 ├── layout/                  # Navbar, Footer
 ├── home/                    # Hero, Stats, Services grid, Why-choose-us, Lead magnet, Service areas, Testimonials, Emergency CTA, Blog preview
 ├── forms/                   # Contact, Inline lead, Quote wizard, Lead magnet
@@ -173,6 +278,24 @@ components/
 └── ui/                      # Shadcn-style primitives
 
 lib/
+├── auth/
+│   ├── admin-session.ts     # HMAC-signed session tokens (Edge + Node)
+│   └── server.ts            # requireAdmin() / getAdminSession()
+├── estimating/
+│   ├── decimal.ts           # Fixed-point money math (bigint, no floats)
+│   ├── calc.ts              # The pricing engine — pure and unit tested
+│   ├── assembly.ts          # Assembly explosion + snapshotting
+│   ├── revision.ts          # Revision cloning (parent/child remapping)
+│   ├── recalc.ts            # Row → totals, and persisting cached totals
+│   ├── queries.ts           # Read paths, designed to avoid N+1
+│   ├── page-data.ts         # Request-cached estimate workspace loader
+│   ├── validation.ts        # Zod schemas for every mutation
+│   ├── db.ts                # Service-role client + DB error translation
+│   ├── numbering.ts         # Project / job / revision numbering
+│   ├── constants.ts         # Statuses, units, bid-checklist template
+│   ├── types.ts             # Row types + ActionResult
+│   ├── format.ts            # Currency / hours / date formatting
+│   └── actions/             # Server actions (all behind withAdmin())
 ├── constants.ts             # Business info, services, locations, testimonials
 ├── supabase.ts              # Service-role client
 ├── resend.ts                # Transactional email helpers
@@ -180,6 +303,12 @@ lib/
 ├── validations.ts           # Zod schemas
 ├── blog.ts                  # Filesystem MDX loader
 └── utils.ts                 # cn() helper
+
+scripts/
+├── test-estimating-calc.ts  # 74 calculation-engine tests
+├── test-admin-auth.ts       # 26 session/authorization tests
+├── test-estimating-db.ts    # DB + RLS integration tests (skips without env)
+└── seed-estimating-demo.ts  # Fictional dev cost library
 
 content/blog/                # 3 seed MDX posts
 public/
@@ -229,7 +358,7 @@ Search the codebase for `// TODO:` comments — these mark business-specific val
 
 ---
 
-## Lint & build
+## Lint, test & build
 
 ```bash
 npm run lint            # Next/ESLint
@@ -237,6 +366,8 @@ npm run type-check      # tsc --noEmit
 npm run format          # prettier --write .
 npm run validate:env    # Zod-validates env vars (also runs in prebuild)
 npm run validate:content # Lints MDX frontmatter and body length
+npm run test            # Calculation engine + admin auth + geo sanitizer tests
+npm run test:estimating-db # DB/RLS integration tests (skips without Supabase env)
 npm run analyze         # Bundle analyzer (ANALYZE=true next build)
 npm run build           # Production build
 npm run start           # Run prod build locally

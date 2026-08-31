@@ -236,3 +236,56 @@
     transform: none;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Customer-facing proposal sheet.
+
+   Rendered inside the dark admin but styled as a light document, because it is
+   printed and handed to a general contractor. The print rules hide every piece
+   of admin chrome so the browser's own "Save as PDF" produces the deliverable.
+   --------------------------------------------------------------------------- */
+.proposal-sheet {
+  color: #111827;
+  background: #ffffff;
+}
+.proposal-sheet h1,
+.proposal-sheet h2,
+.proposal-sheet h3 {
+  color: #0b111c;
+}
+
+@media print {
+  @page {
+    size: letter;
+    margin: 0.6in;
+  }
+  body {
+    background: #ffffff !important;
+    background-image: none !important;
+    padding-bottom: 0 !important;
+  }
+  /* Everything outside the sheet is admin chrome. */
+  .print-hidden,
+  #admin-nav,
+  header {
+    display: none !important;
+  }
+  #admin-main {
+    padding: 0 !important;
+  }
+  .proposal-sheet {
+    box-shadow: none !important;
+    border: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  .proposal-sheet a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .proposal-break-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
