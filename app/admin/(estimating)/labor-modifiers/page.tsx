@@ -35,7 +35,7 @@ export default async function LaborModifiersPage({
     return (
       <>
         <PageHeader title="Labor modifiers" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listLaborModifiers')} />
       </>
     );
   }

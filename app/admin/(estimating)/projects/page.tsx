@@ -34,7 +34,7 @@ export default async function ProjectsPage({
     return (
       <>
         <PageHeader title="Projects" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listProjects')} />
       </>
     );
   }

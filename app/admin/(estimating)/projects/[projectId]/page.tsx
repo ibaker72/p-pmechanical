@@ -56,7 +56,7 @@ export default async function ProjectDetailPage({ params }: { params: { projectI
     return (
       <>
         <PageHeader title="Project" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'getProject')} />
       </>
     );
   }

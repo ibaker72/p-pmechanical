@@ -26,7 +26,7 @@ export default async function AssembliesPage() {
     return (
       <>
         <PageHeader title="Assemblies" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listAssemblies')} />
       </>
     );
   }

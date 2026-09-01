@@ -26,7 +26,7 @@ export default async function JobsPage() {
     return (
       <>
         <PageHeader title="Jobs" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listJobs')} />
       </>
     );
   }

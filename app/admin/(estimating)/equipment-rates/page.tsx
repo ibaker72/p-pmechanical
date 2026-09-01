@@ -36,7 +36,7 @@ export default async function EquipmentRatesPage({
     return (
       <>
         <PageHeader title="Equipment rates" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listEquipmentRates')} />
       </>
     );
   }

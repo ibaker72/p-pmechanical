@@ -35,7 +35,7 @@ export default async function EstimatesPage({
     return (
       <>
         <PageHeader title="Estimates" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listEstimates')} />
       </>
     );
   }

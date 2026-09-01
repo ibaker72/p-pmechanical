@@ -35,6 +35,21 @@ cannot read or write any of it under any circumstances. All access is
 server-side through `SUPABASE_SERVICE_ROLE_KEY`, behind the `/admin` session
 check (`lib/auth/server.ts`).
 
+> **`service_role` needs table grants, not just BYPASSRLS.** These migrations
+> never `GRANT` to `service_role`; they rely on Supabase's stock default
+> privileges for schema `public`. If those defaults are ever narrowed, every
+> table created afterwards is unreadable by the server and the admin renders
+> "The estimating database is not ready" with `42501 permission denied`.
+> Migration `007_restore_service_role_grants.sql` repairs both the existing
+> grants and the default. Check it with:
+>
+> ```sql
+> select has_table_privilege('service_role', 'public.projects', 'SELECT'); -- expect true
+> select has_table_privilege('anon',         'public.projects', 'SELECT'); -- expect false
+> ```
+>
+> `npm run diagnose:db` reports the same thing from the app's own client.
+
 | Table                                                   | Purpose                                                                                                 |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `scope_categories`                                      | Configurable mechanical scope taxonomy (HVAC equipment, ductwork, …). Data, not code.                   |

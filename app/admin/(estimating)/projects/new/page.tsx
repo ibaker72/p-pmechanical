@@ -16,7 +16,7 @@ export default async function NewProjectPage() {
     return (
       <>
         <PageHeader title="New project" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'nextProjectNumber')} />
       </>
     );
   }

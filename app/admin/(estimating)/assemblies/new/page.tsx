@@ -15,7 +15,7 @@ export default async function NewAssemblyPage() {
     return (
       <>
         <PageHeader title="New assembly" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listScopeCategories')} />
       </>
     );
   }

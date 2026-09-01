@@ -32,7 +32,7 @@ export default async function ScopeCategoriesPage({
     return (
       <>
         <PageHeader title="Scope categories" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listScopeCategories')} />
       </>
     );
   }

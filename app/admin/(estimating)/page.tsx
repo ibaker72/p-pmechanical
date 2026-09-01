@@ -28,7 +28,7 @@ export default async function AdminDashboardPage() {
     return (
       <>
         <PageHeader title="Dashboard" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'getDashboardSummary')} />
       </>
     );
   }

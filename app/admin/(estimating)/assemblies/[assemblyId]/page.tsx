@@ -80,7 +80,7 @@ export default async function AssemblyDetailPage({
     return (
       <>
         <PageHeader title="Assembly" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'getAssemblyWithItems')} />
       </>
     );
   }

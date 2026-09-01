@@ -23,7 +23,7 @@ export default async function EstimateLayout({
     return (
       <>
         <PageHeader title="Estimate" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'loadEstimateWorkspace')} />
       </>
     );
   }

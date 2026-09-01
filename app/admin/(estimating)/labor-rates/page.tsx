@@ -33,7 +33,7 @@ export default async function LaborRatesPage({
     return (
       <>
         <PageHeader title="Labor rates" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listLaborRates')} />
       </>
     );
   }

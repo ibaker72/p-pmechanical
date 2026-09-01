@@ -28,7 +28,7 @@ export default async function VendorsPage({ searchParams }: { searchParams: { ed
     return (
       <>
         <PageHeader title="Vendors & subcontractors" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listVendors')} />
       </>
     );
   }

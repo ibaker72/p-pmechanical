@@ -67,7 +67,7 @@ export default async function MaterialsPage({
     return (
       <>
         <PageHeader title="Material price book" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listMaterials')} />
       </>
     );
   }

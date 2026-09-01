@@ -20,7 +20,7 @@ export default async function NewEstimatePage({
     return (
       <>
         <PageHeader title="New estimate" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'listProjectsForNewEstimate')} />
       </>
     );
   }

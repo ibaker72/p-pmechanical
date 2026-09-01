@@ -46,7 +46,7 @@ export default async function JobDetailPage({ params }: { params: { jobId: strin
     return (
       <>
         <PageHeader title="Job" />
-        <SetupNotice error={describeThrown(error)} />
+        <SetupNotice error={describeThrown(error, 'getJob')} />
       </>
     );
   }
