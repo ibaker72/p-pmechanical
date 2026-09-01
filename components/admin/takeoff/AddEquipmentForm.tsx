@@ -32,7 +32,12 @@ export function AddEquipmentForm({
   }
 
   return (
-    <ActionForm action={addEquipmentLineAction} className="space-y-3" resetOnSuccess>
+    <ActionForm
+      action={addEquipmentLineAction}
+      className="space-y-3"
+      resetOnSuccess
+      refocusOnSuccess
+    >
       <input type="hidden" name="estimate_id" value={estimateId} />
       <FormError />
       <FieldGrid columns={4}>

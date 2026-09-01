@@ -42,6 +42,7 @@ export function ActionForm<T>({
   className,
   redirectTo,
   resetOnSuccess,
+  refocusOnSuccess,
   onSuccess,
   id,
 }: {
@@ -52,6 +53,12 @@ export function ActionForm<T>({
   redirectTo?: (data: T) => string;
   /** Clear the form after a successful submit — for repeated "add line" work. */
   resetOnSuccess?: boolean;
+  /**
+   * After a successful reset, put the cursor back on the first editable field.
+   * Turns repetitive takeoff entry into type-tab-enter without reaching for the
+   * mouse between lines.
+   */
+  refocusOnSuccess?: boolean;
   onSuccess?: (data: T) => void;
   id?: string;
 }) {
@@ -65,9 +72,15 @@ export function ActionForm<T>({
     if (!state || !state.ok || handled.current === state) return;
     handled.current = state;
     if (resetOnSuccess) formRef.current?.reset();
+    if (refocusOnSuccess) {
+      const first = formRef.current?.querySelector<HTMLElement>(
+        'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])',
+      );
+      first?.focus();
+    }
     onSuccess?.(state.data);
     if (redirectTo) router.push(redirectTo(state.data));
-  }, [state, redirectTo, resetOnSuccess, onSuccess, router]);
+  }, [state, redirectTo, resetOnSuccess, refocusOnSuccess, onSuccess, router]);
 
   return (
     <FormResultContext.Provider value={state}>

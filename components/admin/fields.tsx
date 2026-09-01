@@ -47,11 +47,23 @@ export function TextInput({ className, ...props }: React.InputHTMLAttributes<HTM
 }
 
 /** Numeric input: right-aligned, tabular, and step-friendly for fast entry. */
-export function NumberInput({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
+export function NumberInput({
+  className,
+  onWheel,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       type="number"
       inputMode="decimal"
+      // A focused number input normally captures the mouse wheel and silently
+      // changes its value. On a long takeoff that means scrolling past a
+      // quantity field quietly edits the bid. Blurring on wheel lets the page
+      // scroll and leaves the number alone.
+      onWheel={(event) => {
+        event.currentTarget.blur();
+        onWheel?.(event);
+      }}
       {...props}
       id={props.id ?? props.name}
       className={cn(baseInput, 'text-right tabular-nums', className)}

@@ -16,7 +16,12 @@ export function AddSubcontractForm({
   scopeCategories: ScopeCategory[];
 }) {
   return (
-    <ActionForm action={addSubcontractLineAction} className="space-y-3" resetOnSuccess>
+    <ActionForm
+      action={addSubcontractLineAction}
+      className="space-y-3"
+      resetOnSuccess
+      refocusOnSuccess
+    >
       <input type="hidden" name="estimate_id" value={estimateId} />
       <FormError />
       <FieldGrid columns={4}>

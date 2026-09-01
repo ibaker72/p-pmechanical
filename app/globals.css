@@ -289,3 +289,15 @@
     page-break-inside: avoid;
   }
 }
+
+/* Sticky column headings for the takeoff grid.
+
+   `top` clears the sticky estimate totals bar that sits above it, so the two
+   never overlap while scrolling a long takeoff. The background is opaque
+   because rows scroll underneath it. Applied only where TableWrap opts in. */
+.table-sticky-head thead th {
+  position: sticky;
+  top: 3.25rem;
+  z-index: 10;
+  background-color: #0b111c;
+}

@@ -39,7 +39,7 @@ export function AddAssemblyForm({
   }
 
   return (
-    <ActionForm action={addAssemblyAction} className="space-y-3" resetOnSuccess>
+    <ActionForm action={addAssemblyAction} className="space-y-3" resetOnSuccess refocusOnSuccess>
       <input type="hidden" name="estimate_id" value={estimateId} />
       <FormError />
       <p className="text-xs text-steel-500">

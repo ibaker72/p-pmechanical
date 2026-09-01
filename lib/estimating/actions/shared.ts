@@ -39,12 +39,15 @@ export async function withAdmin<T>(
   context: string,
   fn: (session: AdminSession) => Promise<ActionResult<T>>,
 ): Promise<ActionResult<T>> {
-  const session = await requireAdminForAction();
-  if (!session) {
-    return actionError('Your session has expired. Sign in again to continue.');
-  }
-
+  // The session lookup is inside the try so that a failure in the cookie layer
+  // itself surfaces as a clean, actionable message rather than an unhandled
+  // 500 with a stack digest. It stays the FIRST thing that happens: `fn` is
+  // only ever reached with a verified session.
   try {
+    const session = await requireAdminForAction();
+    if (!session) {
+      return actionError('Your session has expired. Sign in again to continue.');
+    }
     return await fn(session);
   } catch (error) {
     logDbError(context, error);

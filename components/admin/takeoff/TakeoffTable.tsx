@@ -117,7 +117,7 @@ export function TakeoffTable({
   }
 
   return (
-    <TableWrap>
+    <TableWrap stickyHeader>
       <Table>
         <thead>
           <tr>

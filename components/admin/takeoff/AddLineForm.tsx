@@ -44,7 +44,12 @@ export function AddLineForm({
   const showsOther = lineType === 'allowance' || lineType === 'lump_sum' || lineType === 'other';
 
   return (
-    <ActionForm action={createTakeoffItemAction} className="space-y-3" resetOnSuccess>
+    <ActionForm
+      action={createTakeoffItemAction}
+      className="space-y-3"
+      resetOnSuccess
+      refocusOnSuccess
+    >
       <input type="hidden" name="estimate_id" value={estimateId} />
       {/* Always submit every cost field so the schema sees a complete line. */}
       {!showsMaterial && <input type="hidden" name="unit_material_cost" value="0" />}

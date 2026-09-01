@@ -228,15 +228,36 @@ export function JobStatusBadge({ status }: { status: JobStatus }) {
 // Tables
 // ---------------------------------------------------------------------------
 
-/** Horizontal scroll lives on the wrapper so the page body never scrolls sideways. */
+/**
+ * Horizontal scroll lives on the wrapper so the page body never scrolls sideways.
+ *
+ * `stickyHeader` keeps the column headings visible while scrolling a long
+ * takeoff. It needs `overflow-y: clip` because `overflow-x: auto` alone would
+ * make this element a vertical scroll container, which silently defeats
+ * `position: sticky` on the header cells. Browsers without `overflow: clip`
+ * simply drop that declaration and the header stops sticking — the table still
+ * renders correctly.
+ */
 export function TableWrap({
   children,
   className,
+  stickyHeader,
 }: {
   children: React.ReactNode;
   className?: string;
+  stickyHeader?: boolean;
 }) {
-  return <div className={cn('w-full overflow-x-auto', className)}>{children}</div>;
+  return (
+    <div
+      className={cn(
+        'w-full overflow-x-auto',
+        stickyHeader && 'table-sticky-head [overflow-y:clip]',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
 }
 
 export function Table({ children, className }: { children: React.ReactNode; className?: string }) {
