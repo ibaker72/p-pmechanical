@@ -40,7 +40,7 @@ The site runs at <http://localhost:3000>.
 | `ADMIN_SESSION_SECRET`               | optional                                 | Dedicated HMAC key for admin session cookies, so the sign-in password and the signing key can rotate independently. Defaults to `ADMIN_SECRET`.              |
 | `ADMIN_EMAIL`                        | optional                                 | Recorded in `created_by` / `updated_by` on estimating records. Defaults to `owner`.                                                                          |
 | `SUPABASE_DOCUMENTS_BUCKET`          | optional                                 | Private Supabase Storage bucket for bid documents. Defaults to `project-documents`.                                                                          |
-| `UPSTASH_REDIS_REST_URL`             | yes in prod                              | Upstash Redis REST URL — backs rate limiting and idempotency on `/api/leads*`.                                                                               |
+| `UPSTASH_REDIS_REST_URL`             | yes in prod                              | Upstash Redis REST URL — backs rate limiting and idempotency on `/api/leads*` and `/admin/login`. Must be a bare `https://<db>.upstash.io` origin, no path.  |
 | `UPSTASH_REDIS_REST_TOKEN`           | yes in prod                              | Upstash Redis REST token.                                                                                                                                    |
 | `WEBHOOK_SECRET`                     | optional                                 | If set, `/api/leads/webhook` requires `X-Webhook-Secret` to match.                                                                                           |
 | `OUTBOUND_WEBHOOK_URL`               | optional                                 | Where to POST `lead.created` events (e.g. OpenClaw, n8n, Make, Zapier).                                                                                      |
@@ -113,6 +113,8 @@ The same endpoint is aliased at `/api/leads/webhook` for stable integration with
 
 - **Honeypot**: every form includes a hidden `website_url` field. Any submission with a non-empty value is silently dropped (returns 200, never written).
 - **Rate limiting** (Upstash): form submissions are limited to 10/min per IP; webhook submissions to 60/min per secret. Set `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` to enable.
+  - A limiter failure is never a 5xx. If Redis is unreachable or answers with something the client cannot parse, `lib/ratelimit.ts` logs the fault (with the URL and token scrubbed) and falls back to a stricter in-process limiter — 5/min for forms, 30/min for webhooks, per server instance. A circuit breaker stops re-trying Redis for 30s after three consecutive failures. Requests are still limited while degraded; the limiter never fails open.
+  - With no Upstash credentials at all (local dev) the limiter is a documented no-op and reports `skipped: true`. Credentials that are present but malformed count as an outage, not a no-op.
 - **Webhook auth**: set `WEBHOOK_SECRET` and present the same value in the `X-Webhook-Secret` header on every webhook POST.
 - **Idempotency**: clients may pass `Idempotency-Key: <uuid>` — the API returns the original `lead_id` on retries within a 24-hour window.
 

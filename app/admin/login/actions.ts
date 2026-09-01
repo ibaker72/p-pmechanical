@@ -26,11 +26,38 @@ function requestIp(): string {
 }
 
 /**
+ * Rate limit one sign-in attempt.
+ *
+ * `limitForm` is contractually total — it degrades to an in-process limiter
+ * rather than throwing when Redis is unreachable (see lib/ratelimit.ts). This
+ * wrapper is the second layer of that guarantee: if the limiter ever fails in a
+ * way it did not anticipate, the sign-in form must still render an answer
+ * instead of turning into a 500. A throw here is a bug, so it is logged loudly
+ * and the attempt is allowed through to the constant-time password check, which
+ * is the actual authorization boundary.
+ */
+async function limitSignInAttempt(): Promise<{ allowed: boolean }> {
+  try {
+    const result = await limitForm(`admin-login:${requestIp()}`);
+    return { allowed: result.success };
+  } catch (error) {
+    console.error(
+      `[admin-login] rate limiter threw unexpectedly: ${
+        error instanceof Error ? `${error.name}: ${error.message}` : String(error)
+      }`,
+    );
+    return { allowed: true };
+  }
+}
+
+/**
  * Sign in to the admin.
  *
  * Reuses the app's existing Upstash rate limiter so repeated password guesses
  * are throttled the same way the public lead forms are. When Upstash is not
- * configured the limiter is a documented no-op (see lib/ratelimit.ts).
+ * configured the limiter is a documented no-op (see lib/ratelimit.ts); when it
+ * is configured but unreachable, the limiter degrades to a stricter in-process
+ * window rather than failing open or failing the request.
  */
 export async function loginAction(
   _prev: ActionResult<undefined> | null,
@@ -50,8 +77,8 @@ export async function loginAction(
     return actionError('Enter the admin password.');
   }
 
-  const limit = await limitForm(`admin-login:${requestIp()}`);
-  if (!limit.success) {
+  const limit = await limitSignInAttempt();
+  if (!limit.allowed) {
     return actionError('Too many sign-in attempts. Wait a minute and try again.');
   }
 
